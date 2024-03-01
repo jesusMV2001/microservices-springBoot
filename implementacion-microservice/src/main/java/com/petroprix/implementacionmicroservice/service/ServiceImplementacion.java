@@ -18,6 +18,7 @@ import com.petroprix.implementacionmicroservice.repository.RequisitoFuncionalRep
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -97,20 +98,19 @@ public class ServiceImplementacion {
 
     public ResponseEntity<InputStreamResource> getPDF(Long id) {
         Optional<ImplementacionEntity> implementacionEntity = implementacionRepository.findById(id);
+        if(implementacionEntity.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfWriter writer = new PdfWriter(baos);
         PdfDocument pdfDoc = new PdfDocument(writer);
         Document doc = new Document(pdfDoc);
 
-        implementacionEntity.ifPresent(
-                implementacionEntity1 -> {
-                    try {
-                        crearPDF(implementacionEntity1,doc);
-                    } catch (MalformedURLException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-        );
+        try {
+            crearPDF(implementacionEntity.get(),doc);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
 
         doc.close();
 
