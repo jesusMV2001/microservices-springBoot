@@ -30,8 +30,8 @@ public class RequisitoFuncionalEntity {
     private LocalDateTime fechaModificacion;
     @ElementCollection
     private List<HistoricoComentarios> historicoComentarios;
-
-    //private List<RequisitoTecnicoEntity> requisitosTecnicos;
+    @OneToMany
+    private List<RequisitoTecnicoEntity> requisitosTecnicos;
 
 
     public RequisitoFuncionalEntity(DTORequisitoFuncional r){

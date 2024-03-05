@@ -6,16 +6,15 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.properties.ListNumberingType;
 import com.itextpdf.layout.properties.UnitValue;
-import com.petroprix.implementacionmicroservice.controller.dto.DTOHistoricoComentarios;
-import com.petroprix.implementacionmicroservice.controller.dto.DTOImplementacion;
-import com.petroprix.implementacionmicroservice.controller.dto.DTORegistroCambios;
-import com.petroprix.implementacionmicroservice.controller.dto.DTORequisitoFuncional;
+import com.petroprix.implementacionmicroservice.controller.dto.*;
 import com.petroprix.implementacionmicroservice.collection.HistoricoComentarios;
 import com.petroprix.implementacionmicroservice.entity.ImplementacionEntity;
 import com.petroprix.implementacionmicroservice.collection.RegistroCambios;
 import com.petroprix.implementacionmicroservice.entity.RequisitoFuncionalEntity;
+import com.petroprix.implementacionmicroservice.entity.RequisitoTecnicoEntity;
 import com.petroprix.implementacionmicroservice.repository.ImplementacionRepository;
 import com.petroprix.implementacionmicroservice.repository.RequisitoFuncionalRepository;
+import com.petroprix.implementacionmicroservice.repository.RequisitoTecnicoRepository;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -44,7 +43,10 @@ public class ServiceImplementacion {
     @Autowired
     ImplementacionRepository implementacionRepository;
     @Autowired
-    RequisitoFuncionalRepository requisitoFuncionalRepositorio;
+    RequisitoFuncionalRepository requisitoFuncionalRepository;
+    @Autowired
+    RequisitoTecnicoRepository requisitoTecnicoRepository;
+
     public List<ImplementacionEntity> verImplementaciones(){
         return implementacionRepository.findAll();
     }
@@ -82,7 +84,7 @@ public class ServiceImplementacion {
             if(null == requisitoFuncionalEntity.getFechaCreacion())
                 requisitoFuncionalEntity.setFechaCreacion(LocalDateTime.now());
 
-            requisitoFuncionalRepositorio.save(requisitoFuncionalEntity);
+            requisitoFuncionalRepository.save(requisitoFuncionalEntity);
 
             implementacion.getRequisitoFuncionalEntityList().add(requisitoFuncionalEntity);
             implementacionRepository.save(implementacion);
@@ -90,7 +92,7 @@ public class ServiceImplementacion {
     }
 
     public void addComentario(Long id, DTOHistoricoComentarios dtoHistoricoComentarios) {
-        Optional<RequisitoFuncionalEntity> requisitoFuncional = requisitoFuncionalRepositorio.findById(id);
+        Optional<RequisitoFuncionalEntity> requisitoFuncional = requisitoFuncionalRepository.findById(id);
 
         requisitoFuncional.ifPresent(requisitoFuncionalEntity -> {
             HistoricoComentarios comentario = new HistoricoComentarios(dtoHistoricoComentarios);
@@ -98,11 +100,30 @@ public class ServiceImplementacion {
                 comentario.setFecha(LocalDateTime.now());
 
             requisitoFuncionalEntity.getHistoricoComentarios().add(comentario);
-            requisitoFuncionalRepositorio.save(requisitoFuncionalEntity);
+            requisitoFuncionalRepository.save(requisitoFuncionalEntity);
         });
     }
 
-    public ResponseEntity<InputStreamResource> getPDF(Long id) {
+    public void addRequisitoTecnico(Long requisitoFuncionalId, DTORequisitoTecnico dtoRequisitoTecnico) {
+        Optional<RequisitoFuncionalEntity> requisitoFuncionalEntity = requisitoFuncionalRepository.findById(requisitoFuncionalId);
+
+        requisitoFuncionalEntity.ifPresent(requisitoFuncional -> {
+            RequisitoTecnicoEntity requisitoTecnico = new RequisitoTecnicoEntity(dtoRequisitoTecnico);
+
+            requisitoTecnicoRepository.save(requisitoTecnico);
+            requisitoFuncional.getRequisitosTecnicos().add(requisitoTecnico);
+            requisitoFuncionalRepository.save(requisitoFuncional);
+        });
+    }
+
+    /**
+     * Crea el pdf y se rellena con los datos de la implementacion
+     *
+     * @param id id de la implementacion
+     * @param RT indica si hay que añadir los requisitos tecnicos al pdf o no
+     * @return pdf
+     */
+    public ResponseEntity<InputStreamResource> getPDF(Long id, Boolean RT) {
         Optional<ImplementacionEntity> implementacionEntity = implementacionRepository.findById(id);
         if(implementacionEntity.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -113,7 +134,7 @@ public class ServiceImplementacion {
         Document doc = new Document(pdfDoc);
 
         try {
-            crearPDF(implementacionEntity.get(),doc);
+            crearPDF(implementacionEntity.get(),doc,RT);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -137,22 +158,24 @@ public class ServiceImplementacion {
      * Crea las distintas paginas del pdf
      *
      * @param implementacionEntity implementacion la cual se va a detallar en el pdf
-     * @param doc documento pdf
+     * @param doc                  documento pdf
+     * @param RT indica si hay que añadir los requisitos tecnicos al pdf o no
      */
-    private void crearPDF(ImplementacionEntity implementacionEntity, Document doc) throws MalformedURLException {
+    private void crearPDF(ImplementacionEntity implementacionEntity, Document doc, Boolean RT) throws MalformedURLException {
         crearPortada(implementacionEntity,doc);
         crearHojaControl(implementacionEntity,doc);
         crearPropositoAlcance(implementacionEntity,doc);
-        crearRequisitosFuncionales(implementacionEntity,doc);
+        crearRequisitosFuncionales(implementacionEntity,doc,RT);
     }
 
     /**
      * Crea el apartado del pdf con los requisitos funcionales
      *
      * @param implementacionEntity implementacion la cual se va a detallar en el pdf
-     * @param doc documento pdf
+     * @param doc                  documento pdf
+     * @param RT indica si hay que añadir los requisitos tecnicos al pdf o no
      */
-    private void crearRequisitosFuncionales(ImplementacionEntity implementacionEntity, Document doc){
+    private void crearRequisitosFuncionales(ImplementacionEntity implementacionEntity, Document doc, Boolean RT){
         //titulo
         doc.add(new Paragraph("3. Requisitos Funcionales").setBold().setFontSize(16));
 
@@ -167,17 +190,26 @@ public class ServiceImplementacion {
             //se añade cada atributo del requisito a la sublista
             Arrays.stream(rf.getClass().getDeclaredFields()).sequential().forEach(field -> {
                 try {
+                    ListItem item = new ListItem();
                     field.setAccessible(true);
+                    //cambia el formato de la fecha
                     if(field.get(rf) instanceof LocalDateTime){
                         String valorFormateado = ((LocalDateTime) field.get(rf)).format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-                        subList.add(field.getName() +": "+ valorFormateado);
-                    }else
-                        subList.add(field.getName() +": "+ field.get(rf));
+                        item.add(new Paragraph(new Text(field.getName()).setBold().setUnderline()).add(": "+valorFormateado));
+                    }
+                    // comprueba si hay que añadir los requisitos tecnicos
+                    else if (field.getName().equals("requisitosTecnicos")) {
+                        if(RT) item.add(new Paragraph(new Text(field.getName()).setBold().setUnderline()).add(": "+field.get(rf)));
+                    }
+                    //mete el resto de atributos
+                    else
+                        item.add(new Paragraph(new Text(field.getName()).setBold().setUnderline()).add(": "+field.get(rf)));
+
+                    subList.add(item);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
             });
-
 
             l.add(subList);
             sectionList.add(l);
@@ -294,6 +326,4 @@ public class ServiceImplementacion {
 
         return table;
     }
-
-
 }
