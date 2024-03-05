@@ -2,7 +2,6 @@ package com.petroprix.implementacionmicroservice.controller.dto;
 
 
 import com.petroprix.implementacionmicroservice.entity.ImplementacionEntity;
-import com.petroprix.implementacionmicroservice.entity.RegistroCambiosEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;

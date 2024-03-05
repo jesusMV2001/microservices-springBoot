@@ -1,16 +1,14 @@
 package com.petroprix.implementacionmicroservice.entity;
 
+import com.petroprix.implementacionmicroservice.collection.RegistroCambios;
 import com.petroprix.implementacionmicroservice.controller.dto.DTOImplementacion;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -30,8 +28,8 @@ public class ImplementacionEntity {
     @OneToMany
     private List<RequisitoFuncionalEntity> requisitoFuncionalEntityList = new ArrayList<>();
     private LocalDateTime fecha;
-    @OneToMany
-    private List<RegistroCambiosEntity> registroCambiosEntities = new ArrayList<>();
+    @ElementCollection
+    private List<RegistroCambios> registroCambiosEntities = new ArrayList<>();
 
     public ImplementacionEntity(DTOImplementacion implementacion){
         this.nombre=implementacion.nombre();
@@ -45,6 +43,6 @@ public class ImplementacionEntity {
         if(null == implementacion.registro())
             this.registroCambiosEntities=new ArrayList<>();
         else
-            this.registroCambiosEntities=implementacion.registro().stream().map(RegistroCambiosEntity::new).toList();
+            this.registroCambiosEntities=implementacion.registro().stream().map(RegistroCambios::new).toList();
     }
 }

@@ -10,13 +10,11 @@ import com.petroprix.implementacionmicroservice.controller.dto.DTOHistoricoComen
 import com.petroprix.implementacionmicroservice.controller.dto.DTOImplementacion;
 import com.petroprix.implementacionmicroservice.controller.dto.DTORegistroCambios;
 import com.petroprix.implementacionmicroservice.controller.dto.DTORequisitoFuncional;
-import com.petroprix.implementacionmicroservice.entity.HistoricoComentariosEntity;
+import com.petroprix.implementacionmicroservice.collection.HistoricoComentarios;
 import com.petroprix.implementacionmicroservice.entity.ImplementacionEntity;
-import com.petroprix.implementacionmicroservice.entity.RegistroCambiosEntity;
+import com.petroprix.implementacionmicroservice.collection.RegistroCambios;
 import com.petroprix.implementacionmicroservice.entity.RequisitoFuncionalEntity;
-import com.petroprix.implementacionmicroservice.repository.HistoricoComentariosRepository;
 import com.petroprix.implementacionmicroservice.repository.ImplementacionRepository;
-import com.petroprix.implementacionmicroservice.repository.RegistroCambiosRepository;
 import com.petroprix.implementacionmicroservice.repository.RequisitoFuncionalRepository;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,12 +44,7 @@ public class ServiceImplementacion {
     @Autowired
     ImplementacionRepository implementacionRepository;
     @Autowired
-    RegistroCambiosRepository registroCambiosRepository;
-    @Autowired
     RequisitoFuncionalRepository requisitoFuncionalRepositorio;
-    @Autowired
-    HistoricoComentariosRepository historicoComentariosRepository;
-
     public List<ImplementacionEntity> verImplementaciones(){
         return implementacionRepository.findAll();
     }
@@ -61,8 +54,7 @@ public class ServiceImplementacion {
         if(null == implementacion.fecha())
             implementacionEntity.setFecha(LocalDateTime.now());
 
-        RegistroCambiosEntity r = new RegistroCambiosEntity("1.0",LocalDateTime.now(),"Version inicial");
-        registroCambiosRepository.save(r);
+        RegistroCambios r = new RegistroCambios("1.0",LocalDateTime.now(),"Version inicial");
         implementacionEntity.getRegistroCambiosEntities().add(r);
 
         return implementacionRepository.save(implementacionEntity);
@@ -72,10 +64,10 @@ public class ServiceImplementacion {
         Optional<ImplementacionEntity> implementacionOptional = implementacionRepository.findById(id);
 
         implementacionOptional.ifPresent(implementacion -> {
-            RegistroCambiosEntity registroCambiosEntity = new RegistroCambiosEntity(registroCambios);
+            RegistroCambios registroCambiosEntity = new RegistroCambios(registroCambios);
             if(null == registroCambiosEntity.getFechaCambio())
                 registroCambiosEntity.setFechaCambio(LocalDateTime.now());
-            registroCambiosRepository.save(registroCambiosEntity);
+
 
             implementacion.getRegistroCambiosEntities().add(registroCambiosEntity);
             implementacionRepository.save(implementacion);
@@ -101,10 +93,10 @@ public class ServiceImplementacion {
         Optional<RequisitoFuncionalEntity> requisitoFuncional = requisitoFuncionalRepositorio.findById(id);
 
         requisitoFuncional.ifPresent(requisitoFuncionalEntity -> {
-            HistoricoComentariosEntity comentario = new HistoricoComentariosEntity(dtoHistoricoComentarios);
+            HistoricoComentarios comentario = new HistoricoComentarios(dtoHistoricoComentarios);
             if(null == comentario.getFecha())
                 comentario.setFecha(LocalDateTime.now());
-            historicoComentariosRepository.save(comentario);
+
             requisitoFuncionalEntity.getHistoricoComentarios().add(comentario);
             requisitoFuncionalRepositorio.save(requisitoFuncionalEntity);
         });

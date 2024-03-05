@@ -1,15 +1,14 @@
 package com.petroprix.implementacionmicroservice.controller.dto;
 
-import com.petroprix.implementacionmicroservice.entity.HistoricoComentariosEntity;
+import com.petroprix.implementacionmicroservice.collection.HistoricoComentarios;
 
 import java.time.LocalDateTime;
 
 public record DTOHistoricoComentarios(
-        Long id,
         String comentario,
         LocalDateTime fecha
 ) {
-    public DTOHistoricoComentarios(HistoricoComentariosEntity h){
-        this(h.getId(),h.getComentario(),h.getFecha());
+    public DTOHistoricoComentarios(HistoricoComentarios h){
+        this(h.getComentario(),h.getFecha());
     }
 }

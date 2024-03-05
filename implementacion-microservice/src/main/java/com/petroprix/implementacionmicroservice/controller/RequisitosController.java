@@ -5,8 +5,6 @@ import com.petroprix.implementacionmicroservice.controller.dto.DTOHistoricoComen
 import com.petroprix.implementacionmicroservice.controller.dto.DTOImplementacion;
 import com.petroprix.implementacionmicroservice.controller.dto.DTORegistroCambios;
 import com.petroprix.implementacionmicroservice.controller.dto.DTORequisitoFuncional;
-import com.petroprix.implementacionmicroservice.entity.RegistroCambiosEntity;
-import com.petroprix.implementacionmicroservice.entity.RequisitoFuncionalEntity;
 import com.petroprix.implementacionmicroservice.service.ServiceImplementacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;

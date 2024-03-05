@@ -1,6 +1,7 @@
 package com.petroprix.implementacionmicroservice.entity;
 
 
+import com.petroprix.implementacionmicroservice.collection.HistoricoComentarios;
 import com.petroprix.implementacionmicroservice.controller.dto.DTORequisitoFuncional;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,11 +28,14 @@ public class RequisitoFuncionalEntity {
     private String estado;
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaModificacion;
-    @OneToMany
-    private List<HistoricoComentariosEntity> historicoComentarios;
+    @ElementCollection
+    private List<HistoricoComentarios> historicoComentarios;
+
+    //private List<RequisitoTecnicoEntity> requisitosTecnicos;
 
 
     public RequisitoFuncionalEntity(DTORequisitoFuncional r){
+        this.estado=r.estado();
         this.titulo=r.titulo();
         this.reglas=r.reglas();
         this.descripcion=r.descripcion();
@@ -40,7 +44,7 @@ public class RequisitoFuncionalEntity {
         if(null == r.comentarios())
             historicoComentarios=new ArrayList<>();
         else
-            historicoComentarios = r.comentarios().stream().map(HistoricoComentariosEntity::new).toList();
+            historicoComentarios = r.comentarios().stream().map(HistoricoComentarios::new).toList();
     }
 
 }
