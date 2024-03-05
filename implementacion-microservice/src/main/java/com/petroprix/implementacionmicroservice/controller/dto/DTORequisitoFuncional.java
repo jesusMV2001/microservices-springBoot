@@ -3,15 +3,19 @@ package com.petroprix.implementacionmicroservice.controller.dto;
 import com.petroprix.implementacionmicroservice.entity.RequisitoFuncionalEntity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record DTORequisitoFuncional (
         Long id,
         String titulo,
         String descripcion,
         String reglas,
-        LocalDateTime fechaCambio
+        LocalDateTime fechaCambio,
+        LocalDateTime fechaModificacion,
+        List<DTOHistoricoComentarios> comentarios
 ){
     public DTORequisitoFuncional(RequisitoFuncionalEntity r){
-        this(r.getId(),r.getTitulo(),r.getDescripcion(),r.getReglas(),r.getFechaCreacion());
+        this(r.getId(),r.getTitulo(),r.getDescripcion(),r.getReglas(),r.getFechaCreacion(),r.getFechaModificacion(),
+                r.getHistoricoComentarios().stream().map(DTOHistoricoComentarios::new).toList());
     }
 }

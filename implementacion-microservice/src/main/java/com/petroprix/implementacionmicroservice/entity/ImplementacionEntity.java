@@ -30,8 +30,7 @@ public class ImplementacionEntity {
     @OneToMany
     private List<RequisitoFuncionalEntity> requisitoFuncionalEntityList = new ArrayList<>();
     private LocalDateTime fecha;
-    @OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
-    @JoinColumn(name = "implementacionEntity_id")
+    @OneToMany
     private List<RegistroCambiosEntity> registroCambiosEntities = new ArrayList<>();
 
     public ImplementacionEntity(DTOImplementacion implementacion){

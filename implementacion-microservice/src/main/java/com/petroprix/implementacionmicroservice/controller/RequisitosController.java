@@ -1,6 +1,7 @@
 package com.petroprix.implementacionmicroservice.controller;
 
 
+import com.petroprix.implementacionmicroservice.controller.dto.DTOHistoricoComentarios;
 import com.petroprix.implementacionmicroservice.controller.dto.DTOImplementacion;
 import com.petroprix.implementacionmicroservice.controller.dto.DTORegistroCambios;
 import com.petroprix.implementacionmicroservice.controller.dto.DTORequisitoFuncional;
@@ -34,12 +35,6 @@ public class RequisitosController {
                 .body(new DTOImplementacion(serviceImplementacion.crearImplementacion(implementacion)));
     }
 
-    @DeleteMapping
-    @ResponseStatus(HttpStatus.OK)
-    private void borrarImplementaciones(){
-        serviceImplementacion.borrarImplementaciones();
-    }
-
     @PostMapping("/{id}/RegitroCambios")
     @ResponseStatus(HttpStatus.OK)
     private void addRegistroCambios(@PathVariable Long id, @RequestBody DTORegistroCambios registroCambios) {
@@ -54,6 +49,11 @@ public class RequisitosController {
     @PostMapping("/{id}/RequisitoFuncional")
     private void addRequisitoFuncional(@PathVariable Long id, @RequestBody DTORequisitoFuncional requisitoFuncional){
         serviceImplementacion.addRequisito(id, requisitoFuncional);
+    }
+
+    @PostMapping("/RequisitoFuncional/{id}/Comentario")
+    private void addComentario(@PathVariable Long id, @RequestBody DTOHistoricoComentarios dtoHistoricoComentarios){
+        serviceImplementacion.addComentario(id,dtoHistoricoComentarios);
     }
 
 }

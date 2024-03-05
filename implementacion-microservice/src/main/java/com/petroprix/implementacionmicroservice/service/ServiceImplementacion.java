@@ -6,12 +6,15 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.properties.ListNumberingType;
 import com.itextpdf.layout.properties.UnitValue;
+import com.petroprix.implementacionmicroservice.controller.dto.DTOHistoricoComentarios;
 import com.petroprix.implementacionmicroservice.controller.dto.DTOImplementacion;
 import com.petroprix.implementacionmicroservice.controller.dto.DTORegistroCambios;
 import com.petroprix.implementacionmicroservice.controller.dto.DTORequisitoFuncional;
+import com.petroprix.implementacionmicroservice.entity.HistoricoComentariosEntity;
 import com.petroprix.implementacionmicroservice.entity.ImplementacionEntity;
 import com.petroprix.implementacionmicroservice.entity.RegistroCambiosEntity;
 import com.petroprix.implementacionmicroservice.entity.RequisitoFuncionalEntity;
+import com.petroprix.implementacionmicroservice.repository.HistoricoComentariosRepository;
 import com.petroprix.implementacionmicroservice.repository.ImplementacionRepository;
 import com.petroprix.implementacionmicroservice.repository.RegistroCambiosRepository;
 import com.petroprix.implementacionmicroservice.repository.RequisitoFuncionalRepository;
@@ -46,6 +49,8 @@ public class ServiceImplementacion {
     RegistroCambiosRepository registroCambiosRepository;
     @Autowired
     RequisitoFuncionalRepository requisitoFuncionalRepositorio;
+    @Autowired
+    HistoricoComentariosRepository historicoComentariosRepository;
 
     public List<ImplementacionEntity> verImplementaciones(){
         return implementacionRepository.findAll();
@@ -61,10 +66,6 @@ public class ServiceImplementacion {
         implementacionEntity.getRegistroCambiosEntities().add(r);
 
         return implementacionRepository.save(implementacionEntity);
-    }
-
-    public void borrarImplementaciones() {
-        implementacionRepository.deleteAll();
     }
 
     public void addRegistroCambios(Long id, DTORegistroCambios registroCambios) {
@@ -93,6 +94,19 @@ public class ServiceImplementacion {
 
             implementacion.getRequisitoFuncionalEntityList().add(requisitoFuncionalEntity);
             implementacionRepository.save(implementacion);
+        });
+    }
+
+    public void addComentario(Long id, DTOHistoricoComentarios dtoHistoricoComentarios) {
+        Optional<RequisitoFuncionalEntity> requisitoFuncional = requisitoFuncionalRepositorio.findById(id);
+
+        requisitoFuncional.ifPresent(requisitoFuncionalEntity -> {
+            HistoricoComentariosEntity comentario = new HistoricoComentariosEntity(dtoHistoricoComentarios);
+            if(null == comentario.getFecha())
+                comentario.setFecha(LocalDateTime.now());
+            historicoComentariosRepository.save(comentario);
+            requisitoFuncionalEntity.getHistoricoComentarios().add(comentario);
+            requisitoFuncionalRepositorio.save(requisitoFuncionalEntity);
         });
     }
 
@@ -288,5 +302,6 @@ public class ServiceImplementacion {
 
         return table;
     }
+
 
 }
