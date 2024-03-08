@@ -91,6 +91,14 @@ public class ServiceImplementacion {
         });
     }
 
+    public ResponseEntity<List<DTORequisitoFuncional>> verRequisitoFuncional(Long id) {
+        Optional<ImplementacionEntity> implementacionOptional = implementacionRepository.findById(id);
+
+        return implementacionOptional.map(implementacionEntity -> ResponseEntity.ok().body(
+                implementacionEntity.getRequisitoFuncionalEntityList().stream().map(DTORequisitoFuncional::new).toList())).
+                orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     public void addComentario(Long id, DTOHistoricoComentarios dtoHistoricoComentarios) {
         Optional<RequisitoFuncionalEntity> requisitoFuncional = requisitoFuncionalRepository.findById(id);
 
@@ -326,4 +334,6 @@ public class ServiceImplementacion {
 
         return table;
     }
+
+
 }

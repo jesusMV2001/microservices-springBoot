@@ -47,6 +47,11 @@ public class RequisitosController {
         serviceImplementacion.addRequisito(id, requisitoFuncional);
     }
 
+    @GetMapping("/{id}/RequisitoFuncional")
+    private ResponseEntity<List<DTORequisitoFuncional>> verRequisitosFuncionales(@PathVariable Long id){
+        return serviceImplementacion.verRequisitoFuncional(id);
+    }
+
     @PostMapping("/RequisitoFuncional/{RequisitoFuncionalId}/Comentario")
     private void addComentario(@PathVariable Long RequisitoFuncionalId, @RequestBody DTOHistoricoComentarios dtoHistoricoComentarios){
         serviceImplementacion.addComentario(RequisitoFuncionalId,dtoHistoricoComentarios);
