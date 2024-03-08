@@ -31,6 +31,12 @@ public class RequisitosController {
                 .body(new DTOImplementacion(serviceImplementacion.crearImplementacion(implementacion)));
     }
 
+    @CrossOrigin(origins = {"http://localhost:5173"})
+    @DeleteMapping("/{id}")
+    private void borrarImplementacion(@PathVariable Long id){
+        serviceImplementacion.borrarImplementacion(id);
+    }
+
     @PostMapping("/{id}/RegitroCambios")
     @ResponseStatus(HttpStatus.OK)
     private void addRegistroCambios(@PathVariable Long id, @RequestBody DTORegistroCambios registroCambios) {

@@ -62,6 +62,12 @@ public class ServiceImplementacion {
         return implementacionRepository.save(implementacionEntity);
     }
 
+    public void borrarImplementacion(Long id) {
+        Optional<ImplementacionEntity> implementacion = implementacionRepository.findById(id);
+
+        implementacion.ifPresent(implementacionEntity -> implementacionRepository.delete(implementacionEntity));
+    }
+
     public void addRegistroCambios(Long id, DTORegistroCambios registroCambios) {
         Optional<ImplementacionEntity> implementacionOptional = implementacionRepository.findById(id);
 
@@ -334,6 +340,7 @@ public class ServiceImplementacion {
 
         return table;
     }
+
 
 
 }
