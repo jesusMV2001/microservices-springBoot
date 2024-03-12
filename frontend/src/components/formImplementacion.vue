@@ -27,6 +27,18 @@
         <textarea id="alcance" v-model="alcance" required
                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
       </div>
+
+      <!-- Lista de requisitos funcionales -->
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2">Requisitos Funcionales:</label>
+        <ul class="list-disc pl-4">
+          <li v-for="(rf, index) in requisitosFuncionales" :key="index">
+            {{ rf.id }}(id): {{rf.titulo}}
+            <button @click.prevent="eliminarRequisitoFuncional(rf.id)" class="text-red-500 ml-2">Eliminar</button>
+          </li>
+        </ul>
+      </div>
+
       <div class="flex items-center justify-between">
         <button type="submit"
                 class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
@@ -49,7 +61,8 @@ export default {
       version: '',
       fecha: '',
       descripcion: '',
-      alcance: ''
+      alcance: '',
+      requisitosFuncionales: []
     };
   },
   mounted() {
@@ -66,6 +79,7 @@ export default {
             this.version = response.data.version
             this.descripcion = response.data.descripcion
             this.alcance = response.data.alcance
+            this.requisitosFuncionales = response.data.requisitoFuncional
 
             const date = new Date(this.data.fecha);
             const day = date.getDate().toString().padStart(2, '0');
@@ -85,7 +99,10 @@ export default {
       this.data.alcance = this.alcance
 
       //TODO hacer peticion a la api
-      console.log(this.data);
+      console.log("aa");
+    },
+    eliminarRequisitoFuncional(id) {
+      console.log(id)
     }
   }
 };
