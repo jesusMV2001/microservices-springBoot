@@ -34,7 +34,8 @@
         <ul class="list-disc pl-4">
           <li v-for="(rf, index) in requisitosFuncionales" :key="index">
             {{ rf.id }}(id): {{rf.titulo}}
-            <button @click.prevent="eliminarRequisitoFuncional(rf.id)" class="text-red-500 ml-2">Eliminar</button>
+            <button @click.prevent="eliminarRequisitoFuncional(rf.id)" v-if="!rfEliminados.at(index)" class="text-red-500 ml-2">Eliminar</button>
+            <button @click.prevent="cancelarEliminacion(rf.id)" v-else class="text-gray-500 ml-2">Cancelar</button>
           </li>
         </ul>
       </div>
@@ -62,7 +63,8 @@ export default {
       fecha: '',
       descripcion: '',
       alcance: '',
-      requisitosFuncionales: []
+      requisitosFuncionales: [],
+      rfEliminados: []
     };
   },
   mounted() {
@@ -80,6 +82,7 @@ export default {
             this.descripcion = response.data.descripcion
             this.alcance = response.data.alcance
             this.requisitosFuncionales = response.data.requisitoFuncional
+            this.requisitosFuncionales.forEach(() => this.rfEliminados.push(false))
 
             const date = new Date(this.data.fecha);
             const day = date.getDate().toString().padStart(2, '0');
@@ -102,6 +105,10 @@ export default {
       console.log("aa");
     },
     eliminarRequisitoFuncional(id) {
+      let index = this.requisitosFuncionales.map(value => value.id===id)
+      console.log(index)
+    },
+    cancelarEliminacion(id){
       console.log(id)
     }
   }
