@@ -11,7 +11,7 @@ public record DTORequisitoFuncional (
         String descripcion,
         String reglas,
         String estado,
-        LocalDateTime fechaCambio,
+        LocalDateTime fechaCreacion,
         LocalDateTime fechaModificacion,
         List<DTOHistoricoComentarios> comentarios,
         List<DTORequisitoTecnico> requisitoTecnicos

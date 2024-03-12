@@ -31,7 +31,16 @@ public class RequisitosController {
                 .body(new DTOImplementacion(serviceImplementacion.crearImplementacion(implementacion)));
     }
 
-    @CrossOrigin(origins = {"http://localhost:5173"})
+    @GetMapping("/{id}")
+    private ResponseEntity<DTOImplementacion> verImplementacion(@PathVariable Long id){
+        return serviceImplementacion.verImplementacion(id);
+    }
+
+    @PutMapping("/{id}")
+    private void cambiarImplementacion(@PathVariable Long id, @RequestBody DTOImplementacion implementacion){
+        serviceImplementacion.cambiarImplementacion(id, implementacion);
+    }
+
     @DeleteMapping("/{id}")
     private void borrarImplementacion(@PathVariable Long id){
         serviceImplementacion.borrarImplementacion(id);

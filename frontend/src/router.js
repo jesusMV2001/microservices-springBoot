@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ApiTable from '@/components/ApiTable.vue'
 import RFTable from '@/components/RFTable.vue'
+import formImplementacion from "@/components/formImplementacion.vue";
 
 const routes = [
     {
@@ -16,8 +17,13 @@ const routes = [
         name: 'RF',
         component: RFTable,
         props: {
-            title: 'Requisitos Técnicos'
+            title: 'Requisitos Funcionales'
         }
+    },
+    {
+        path: '/implementacion/:id',
+        name: 'edit',
+        component: formImplementacion
     }
 ]
 

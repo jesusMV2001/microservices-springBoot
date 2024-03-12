@@ -51,6 +51,27 @@ public class ServiceImplementacion {
         return implementacionRepository.findAll();
     }
 
+    public ResponseEntity<DTOImplementacion> verImplementacion(Long id) {
+        Optional<ImplementacionEntity> implementacion = implementacionRepository.findById(id);
+
+        return implementacion.map(implementacionEntity -> ResponseEntity.ok().body(new DTOImplementacion(implementacionEntity))).
+                orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    public void cambiarImplementacion(Long id, DTOImplementacion implementacionDTO) {
+        Optional<ImplementacionEntity> implementacionEntity = implementacionRepository.findById(id);
+
+        implementacionEntity.ifPresent(i -> {
+            i.setNombre(implementacionDTO.nombre());
+            i.setAlcance(implementacionDTO.alcance());
+            i.setVersion(implementacionDTO.version());
+            i.setDescripcion(implementacionDTO.descripcion());
+            //i.getRegistroCambiosEntities().add();
+
+            implementacionRepository.save(i);
+        });
+    }
+
     public ImplementacionEntity crearImplementacion(DTOImplementacion implementacion){
         ImplementacionEntity implementacionEntity = new ImplementacionEntity(implementacion);
         if(null == implementacion.fecha())

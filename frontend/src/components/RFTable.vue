@@ -5,12 +5,17 @@
       <thead>
       <tr>
         <th v-for="(header, index) in headers" :key="index">{{ header }}</th>
+        <th>Acciones</th>
       </tr>
       </thead>
       <tbody>
       <tr v-for="(row, rowIndex) in data" :key="rowIndex">
         <td v-for="(value, columnIndex) in row" :key="columnIndex">
           {{value}}
+        </td>
+        <td>
+          <button @click="verRequisitosTecnicos(rowIndex)">Requisitos Tecnicos</button>
+          <button @click="verComentarios(rowIndex)">Comentarios</button>
         </td>
       </tr>
       </tbody>
@@ -57,6 +62,12 @@ export default {
           .catch(error => {
             console.error('Error fetching data:', error);
           });
+    },
+    verRequisitosTecnicos(rowIndex){
+
+    },
+    verComentarios(rowIndex){
+
     }
   }
 };

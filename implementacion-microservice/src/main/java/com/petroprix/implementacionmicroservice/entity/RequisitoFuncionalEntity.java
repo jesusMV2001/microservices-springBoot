@@ -39,7 +39,7 @@ public class RequisitoFuncionalEntity {
         this.titulo=r.titulo();
         this.reglas=r.reglas();
         this.descripcion=r.descripcion();
-        this.fechaCreacion=r.fechaCambio();
+        this.fechaCreacion=r.fechaCreacion();
         this.fechaModificacion=r.fechaModificacion();
         if(null == r.comentarios())
             historicoComentarios=new ArrayList<>();

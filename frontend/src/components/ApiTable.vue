@@ -14,15 +14,23 @@
           {{value}}
         </td>
         <td>
-          <!-- Agregar los cuatro botones en la columna de acciones -->
           <button @click="verRequisitosFuncionales(rowIndex)">Requisitos Funcionales</button>
-          <button @click="handleAction2(row)">Botón 2</button>
-          <button @click="handleAction3(row)">Botón 3</button>
+          <button @click="editar(rowIndex)">Editar</button>
+          <button @click="crearPDF(rowIndex)">PDF</button>
           <button class="delete-button" @click="eliminarImplementacion(rowIndex)">Borrar</button>
         </td>
       </tr>
       </tbody>
     </table>
+
+    <div v-if="showModal" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="closeModal">&times;</span>
+        <p>¿Está seguro que desea borrar este elemento?</p>
+        <button @click="confirmDelete">Confirmar</button>
+        <button @click="closeModal">Cancelar</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -44,7 +52,8 @@ export default {
     return {
       headers: [],
       data: [],
-      completeData: []
+      showModal: false,
+      rowIndexToDelete: null
     };
   },
   mounted() {
@@ -54,7 +63,6 @@ export default {
     fetchData() {
       axios.get(this.apiUrl)
           .then(response => {
-            this.completeData = response.data;
             //filtrar los atributos que son listas
             this.data = response.data.map(row => {
               const filteredRow = {};
@@ -72,31 +80,67 @@ export default {
           });
     },
     verRequisitosFuncionales(rowIndex) {
-      let id = this.completeData.at(rowIndex).Id;
+      let id = this.data.at(rowIndex).Id;
       this.$router.push({
         name: 'RF',
         params: {id}
       });
     },
-    handleAction2(row) {
-      // Manejar la acción del botón 2 para la fila dada
-      console.log('Botón 2 clickeado para la fila:', row);
+    editar(rowIndex) {
+      let id = this.data.at(rowIndex).Id;
+      this.$router.push({
+        name: 'edit',
+        params: {id}
+      });
     },
-    handleAction3(row) {
-      // Manejar la acción del botón 3 para la fila dada
-      console.log('Botón 3 clickeado para la fila:', row);
+    crearPDF(rowIndex) {
+      let id = this.data.at(rowIndex).Id;
+      let nombre = this.data.at(rowIndex).nombre
+
+      axios.get(`http://localhost:8080/api/implementacion/${id}/pdf/RT`, {
+        responseType: 'blob' // Establece el tipo de respuesta como 'blob' para manejar archivos binarios
+      })
+          .then(response => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${nombre}.pdf`); // Establece el nombre del archivo que se descargará
+            document.body.appendChild(link);
+            link.click();
+          })
+          .catch(error => {
+            console.error('Error al descargar el archivo PDF:', error);
+          });
     },
     eliminarImplementacion(rowIndex) {
-      let id = this.completeData.at(rowIndex).Id;
-      console.log(id)
+      // Mostrar el modal de confirmación y almacenar el índice de la fila a eliminar
+      this.rowIndexToDelete = rowIndex;
+      this.showModal = true;
+    },
+
+    confirmDelete() {
+      // Obtener el ID del elemento a eliminar
+      let id = this.data[this.rowIndexToDelete].Id;
+
+      // Realizar la eliminación del elemento
       axios.delete(`http://localhost:8080/api/implementacion/${id}`)
           .then(() => {
             // Eliminar la fila de la tabla localmente si la solicitud al servidor fue exitosa
-            this.data = this.data.filter(item => item.id !== id);
+            this.data = this.data.filter(item => item.Id !== id);
+            // Cerrar el modal después de eliminar
+            this.closeModal();
           })
           .catch(error => {
             console.error('Error al eliminar el elemento:', error);
+            // Cerrar el modal en caso de error
+            this.closeModal();
           });
+    },
+
+    closeModal() {
+      // Cerrar el modal y limpiar el índice de la fila a eliminar
+      this.showModal = false;
+      this.rowIndexToDelete = null;
     }
   }
 };
@@ -139,5 +183,38 @@ th {
 
 .delete-button:hover {
   background-color: #d32f2f; /* Color rojo más oscuro al pasar el mouse */
+}
+
+.modal {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 30%;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
 </style>
