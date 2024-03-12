@@ -27,7 +27,6 @@ public class RequisitoFuncionalEntity {
     private String reglas;
     private String estado;
     private LocalDateTime fechaCreacion;
-    private LocalDateTime fechaModificacion;
     @ElementCollection
     private List<HistoricoComentarios> historicoComentarios;
     @OneToMany
@@ -40,7 +39,6 @@ public class RequisitoFuncionalEntity {
         this.reglas=r.reglas();
         this.descripcion=r.descripcion();
         this.fechaCreacion=r.fechaCreacion();
-        this.fechaModificacion=r.fechaModificacion();
         if(null == r.comentarios())
             historicoComentarios=new ArrayList<>();
         else

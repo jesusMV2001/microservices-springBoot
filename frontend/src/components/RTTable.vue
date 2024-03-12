@@ -6,26 +6,21 @@
         <thead>
         <tr>
           <th v-for="(header, index) in headers" :key="index"
-              class="px-4 py-2 bg-gray-200 text-gray-700 uppercase font-bold text-sm border-b">{{ header }}</th>
-          <th class="px-4 py-2 bg-gray-200 text-gray-700 uppercase font-bold text-sm border-b">Acciones</th>
+              class="px-4 py-2 bg-gray-200 text-gray-700 uppercase font-bold text-sm border-b">
+            {{ header }}</th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(row, rowIndex) in data" :key="rowIndex" class="text-gray-700 border-b hover:bg-gray-100">
-          <td v-for="(value, columnIndex) in row" :key="columnIndex"  class="px-4 py-2 border">
-            {{value}}
-          </td>
-          <td class="px-4 py-2 border">
-            <button @click="verRequisitosTecnicos(rowIndex)"
-                    class="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Requisitos Tecnicos</button>
-            <button @click="verComentarios(rowIndex)"
-                    class="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Comentarios</button>
-          </td>
+        <tr v-for="(row, rowIndex) in data" :key="rowIndex"
+            class="text-gray-700 border-b hover:bg-gray-100">
+          <td v-for="(value, columnIndex) in row" :key="columnIndex"
+              class="px-4 py-2 border">{{ value }}</td>
         </tr>
         </tbody>
       </table>
     </div>
   </div>
+
 </template>
 
 <script>
@@ -46,7 +41,7 @@ export default {
   },
   mounted() {
     const id = this.$route.params.id;
-    this.fetchData('http://localhost:8080/api/implementacion/'+id+'/RequisitoFuncional');
+    this.fetchData(`http://localhost:8080/api/implementacion/RequisitoFuncional/${id}/RequisitoTecnico`);
   },
   methods: {
     fetchData(url) {
@@ -67,20 +62,6 @@ export default {
           .catch(error => {
             console.error('Error fetching data:', error);
           });
-    },
-    verRequisitosTecnicos(rowIndex){
-      let id = this.data.at(rowIndex).Id;
-      this.$router.push({
-        name: 'RT',
-        params: {id}
-      });
-    },
-    verComentarios(rowIndex){
-      let id = this.data.at(rowIndex).Id;
-      this.$router.push({
-        name: 'Comentarios',
-        params: {id}
-      });
     }
   }
 };

@@ -12,12 +12,11 @@ public record DTORequisitoFuncional (
         String reglas,
         String estado,
         LocalDateTime fechaCreacion,
-        LocalDateTime fechaModificacion,
         List<DTOHistoricoComentarios> comentarios,
         List<DTORequisitoTecnico> requisitoTecnicos
 ){
     public DTORequisitoFuncional(RequisitoFuncionalEntity r){
-        this(r.getId(),r.getTitulo(),r.getDescripcion(),r.getReglas(),r.getEstado(),r.getFechaCreacion(),r.getFechaModificacion(),
+        this(r.getId(),r.getTitulo(),r.getDescripcion(),r.getReglas(),r.getEstado(),r.getFechaCreacion(),
                 r.getHistoricoComentarios().stream().map(DTOHistoricoComentarios::new).toList(),
                 r.getRequisitosTecnicos().stream().map(DTORequisitoTecnico::new).toList());
     }

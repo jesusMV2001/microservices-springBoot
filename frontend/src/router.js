@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import ApiTable from '@/components/ApiTable.vue'
 import RFTable from '@/components/RFTable.vue'
 import formImplementacion from "@/components/formImplementacion.vue";
+import RTTable from "@/components/RTTable.vue";
+import ComentariosTable from "@/components/ComentariosTable.vue";
 
 const routes = [
     {
@@ -24,6 +26,22 @@ const routes = [
         path: '/implementacion/:id',
         name: 'edit',
         component: formImplementacion
+    },
+    {
+        path: '/RT/:id',
+        name: 'RT',
+        component: RTTable,
+        props: {
+            title: 'Requisitos Técnicos'
+        }
+    },
+    {
+        path: '/Comentario/:id',
+        name: 'Comentarios',
+        component: ComentariosTable,
+        props: {
+            title: 'Comentarios'
+        }
     }
 ]
 

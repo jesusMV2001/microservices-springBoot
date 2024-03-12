@@ -139,6 +139,13 @@ public class ServiceImplementacion {
         });
     }
 
+    public List<HistoricoComentarios> verComentarios(Long requisitoFuncionalId) {
+        Optional<RequisitoFuncionalEntity> requisitoFuncionalEntity = requisitoFuncionalRepository.findById(requisitoFuncionalId);
+
+        return requisitoFuncionalEntity.map(RequisitoFuncionalEntity::getHistoricoComentarios).
+                orElseThrow();
+    }
+
     public void addRequisitoTecnico(Long requisitoFuncionalId, DTORequisitoTecnico dtoRequisitoTecnico) {
         Optional<RequisitoFuncionalEntity> requisitoFuncionalEntity = requisitoFuncionalRepository.findById(requisitoFuncionalId);
 
@@ -149,6 +156,13 @@ public class ServiceImplementacion {
             requisitoFuncional.getRequisitosTecnicos().add(requisitoTecnico);
             requisitoFuncionalRepository.save(requisitoFuncional);
         });
+    }
+
+    public List<RequisitoTecnicoEntity> verRequisitosTecnicos(Long requisitoFuncionalId) {
+        Optional<RequisitoFuncionalEntity> requisitoFuncionalEntity = requisitoFuncionalRepository.findById(requisitoFuncionalId);
+
+        return requisitoFuncionalEntity.map(RequisitoFuncionalEntity::getRequisitosTecnicos).
+                orElseThrow();
     }
 
     /**
@@ -361,7 +375,4 @@ public class ServiceImplementacion {
 
         return table;
     }
-
-
-
 }

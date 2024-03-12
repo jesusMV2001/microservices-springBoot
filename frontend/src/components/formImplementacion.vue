@@ -1,30 +1,41 @@
 <template>
-  <h2>Formulario de Implementación</h2>
-  <div class="form-container" >
-    <form @submit.prevent="submitForm">
-      <div>
-        <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" v-model="nombre" required>
+  <h2 class="text-2xl font-bold mb-4">Formulario de Implementación</h2>
+  <div class="max-w-md mx-auto">
+    <form @submit.prevent="submitForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8">
+      <div class="mb-4">
+        <label for="nombre" class="block text-gray-700 text-sm font-bold mb-2">Nombre:</label>
+        <input type="text" id="nombre" v-model="nombre" required
+               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
       </div>
-      <div>
-        <label for="version">Versión:</label>
-        <input type="text" id="version" v-model="version" required>
+      <div class="mb-4">
+        <label for="version" class="block text-gray-700 text-sm font-bold mb-2">Versión:</label>
+        <input type="text" id="version" v-model="version" required
+               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
       </div>
-      <div>
-        <label for="fecha">Fecha:</label>
-        <input type="date" id="fecha" v-model="fecha" required>
+      <div class="mb-4">
+        <label for="fecha" class="block text-gray-700 text-sm font-bold mb-2">Fecha:</label>
+        <input type="date" id="fecha" v-model="fecha" required
+               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
       </div>
-      <div>
-        <label for="descripcion">Descripción:</label>
-        <textarea id="descripcion" v-model="descripcion" required></textarea>
+      <div class="mb-4">
+        <label for="descripcion" class="block text-gray-700 text-sm font-bold mb-2">Descripción:</label>
+        <textarea id="descripcion" v-model="descripcion" required
+                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
       </div>
-      <div>
-        <label for="alcance">Alcance:</label>
-        <textarea id="alcance" v-model="alcance" required></textarea>
+      <div class="mb-6">
+        <label for="alcance" class="block text-gray-700 text-sm font-bold mb-2">Alcance:</label>
+        <textarea id="alcance" v-model="alcance" required
+                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
       </div>
-      <button type="submit">Enviar</button>
+      <div class="flex items-center justify-between">
+        <button type="submit"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          Enviar
+        </button>
+      </div>
     </form>
   </div>
+
 </template>
 
 <script>
@@ -49,7 +60,6 @@ export default {
     fetchData(url) {
       axios.get(url)
           .then(response => {
-            //filtrar los atributos que son listas
             this.data = response.data
 
             this.nombre = response.data.nombre
@@ -59,7 +69,7 @@ export default {
 
             const date = new Date(this.data.fecha);
             const day = date.getDate().toString().padStart(2, '0');
-            const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Los meses empiezan desde 0
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
             const year = date.getFullYear().toString();
             this.fecha=`${year}-${month}-${day}`
           })
@@ -74,8 +84,7 @@ export default {
       this.data.descripcion = this.descripcion
       this.data.alcance = this.alcance
 
-      // Aquí puedes realizar la lógica para enviar los datos a través de una petición HTTP
-      // Por ejemplo, utilizando axios o fetch
+      //TODO hacer peticion a la api
       console.log(this.data);
     }
   }
@@ -83,9 +92,4 @@ export default {
 </script>
 
 <style scoped>
-.form-container {
-  display: flex;
-  justify-content: center; /* Centra el contenido horizontalmente */
-  height: 100vh; /* Establece la altura del contenedor al 100% de la ventana */
-}
 </style>

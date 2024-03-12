@@ -72,9 +72,19 @@ public class RequisitosController {
         serviceImplementacion.addComentario(RequisitoFuncionalId,dtoHistoricoComentarios);
     }
 
+    @GetMapping("/RequisitoFuncional/{RequisitoFuncionalId}/Comentario")
+    private List<DTOHistoricoComentarios> verComentarios(@PathVariable Long RequisitoFuncionalId){
+        return serviceImplementacion.verComentarios(RequisitoFuncionalId).stream().map(DTOHistoricoComentarios::new).toList();
+    }
+
     @PostMapping("/RequisitoFuncional/{RequisitoFuncionalId}/RequisitoTecnico")
     private void addRequisitoTecnico(@PathVariable Long RequisitoFuncionalId, @RequestBody DTORequisitoTecnico dtoRequisitoTecnico){
         serviceImplementacion.addRequisitoTecnico(RequisitoFuncionalId, dtoRequisitoTecnico);
+    }
+
+    @GetMapping("/RequisitoFuncional/{RequisitoFuncionalId}/RequisitoTecnico")
+    private List<DTORequisitoTecnico> verRequisitosTecnicos(@PathVariable Long RequisitoFuncionalId){
+        return serviceImplementacion.verRequisitosTecnicos(RequisitoFuncionalId).stream().map(DTORequisitoTecnico::new).toList();
     }
 
 }

@@ -1,34 +1,48 @@
 <template>
-  <div>
-    <h2 class="table-title">{{ title }}</h2>
-    <table>
-      <thead>
-      <tr>
-        <th v-for="(header, index) in headers" :key="index">{{ header }}</th>
-        <th>Acciones</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr v-for="(row, rowIndex) in data" :key="rowIndex">
-        <td v-for="(value, columnIndex) in row" :key="columnIndex">
-          {{value}}
-        </td>
-        <td>
-          <button @click="verRequisitosFuncionales(rowIndex)">Requisitos Funcionales</button>
-          <button @click="editar(rowIndex)">Editar</button>
-          <button @click="crearPDF(rowIndex)">PDF</button>
-          <button class="delete-button" @click="eliminarImplementacion(rowIndex)">Borrar</button>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+  <div class="w-full">
+    <h2 class="text-lg font-bold mb-4">{{ title }}</h2>
+    <div class="overflow-x-auto">
+      <table class="table-auto border-collapse w-full">
+        <thead>
+        <tr>
+          <th v-for="(header, index) in headers" :key="index"
+              class="px-4 py-2 bg-gray-200 text-gray-700 uppercase font-bold text-sm border-b">
+            {{ header }}</th>
+          <th class="px-4 py-2 bg-gray-200 text-gray-700 uppercase font-bold text-sm border-b">Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(row, rowIndex) in data" :key="rowIndex"
+            class="text-gray-700 border-b hover:bg-gray-100">
+          <td v-for="(value, columnIndex) in row" :key="columnIndex"
+              class="px-4 py-2 border">{{ value }}</td>
+          <td class="px-4 py-2 border">
+            <button @click="verRequisitosFuncionales(rowIndex)"
+                    class="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Requisitos
+              Funcionales</button>
+            <button @click="editar(rowIndex)"
+                    class="mr-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Editar</button>
+            <button @click="crearPDF(rowIndex)"
+                    class="mr-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">PDF</button>
+            <button @click="eliminarImplementacion(rowIndex)"
+                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Borrar</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-    <div v-if="showModal" class="modal">
-      <div class="modal-content">
-        <span class="close" @click="closeModal">&times;</span>
-        <p>¿Está seguro que desea borrar este elemento?</p>
-        <button @click="confirmDelete">Confirmar</button>
-        <button @click="closeModal">Cancelar</button>
+  <div v-if="showModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="modal-content bg-white p-4 rounded shadow-lg">
+        <span class="close absolute top-0 right-0 m-4 text-gray-600 cursor-pointer"
+              @click="closeModal">&times;</span>
+      <p class="text-lg text-gray-800 mb-4">¿Está seguro que desea borrar este elemento?</p>
+      <div class="flex justify-end">
+        <button @click="confirmDelete"
+                class="mr-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Confirmar</button>
+        <button @click="closeModal"
+                class="bg-gray-400 hover:bg-gray-600 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
       </div>
     </div>
   </div>
@@ -147,74 +161,4 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos opcionales para tu tabla */
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-th {
-  background-color: #f2f2f2;
-}
-
-.table-title {
-  margin-top: 20px; /* Agregar espacio entre el título y la tabla */
-}
-
-.delete-button {
-  background-color: #f44336; /* Color rojo */
-  border: none;
-  color: white;
-  padding: 8px 16px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.delete-button:hover {
-  background-color: #d32f2f; /* Color rojo más oscuro al pasar el mouse */
-}
-
-.modal {
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.4);
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 30%;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
 </style>
