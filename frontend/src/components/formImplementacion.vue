@@ -32,13 +32,15 @@
       <div class="mb-4">
         <label class="block text-gray-700 text-sm font-bold mb-2">Requisitos Funcionales:</label>
         <ul class="list-disc pl-4">
-          <li v-for="(rf, index) in requisitosFuncionales" :key="index">
-            {{ rf.id }}(id): {{rf.titulo}}
+          <li v-for="(rf, index) in requisitosFuncionales" :key="index"  >
+            <span :class="{ 'line-through': rfEliminados[index] }">{{ rf.id }}(id): {{ rf.titulo }}</span>
             <button @click.prevent="eliminarRequisitoFuncional(rf.id)" v-if="!rfEliminados.at(index)" class="text-red-500 ml-2">Eliminar</button>
             <button @click.prevent="cancelarEliminacion(rf.id)" v-else class="text-gray-500 ml-2">Cancelar</button>
           </li>
         </ul>
       </div>
+
+
 
       <div class="flex items-center justify-between">
         <button type="submit"
@@ -105,11 +107,12 @@ export default {
       console.log("aa");
     },
     eliminarRequisitoFuncional(id) {
-      let index = this.requisitosFuncionales.map(value => value.id===id)
-      console.log(index)
+      let index = this.requisitosFuncionales.findIndex(value => value.id === id);
+      this.rfEliminados[index]=true
     },
     cancelarEliminacion(id){
-      console.log(id)
+      let index = this.requisitosFuncionales.findIndex(value => value.id === id);
+      this.rfEliminados[index]=false
     }
   }
 };

@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <h2 class="text-lg font-bold mb-4">{{ title }}</h2>
+    <h2 class="text-2xl font-bold mb-4">{{ title }}</h2>
     <div class="overflow-x-auto">
       <table class="table-auto border-collapse w-full">
         <thead>
@@ -118,7 +118,7 @@ export default {
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `${nombre}.pdf`); // Establece el nombre del archivo que se descargará
+            link.setAttribute('download', `${nombre}.pdf`);
             document.body.appendChild(link);
             link.click();
           })

@@ -1,20 +1,24 @@
 <template>
   <div>
-    <h2 class="table-title">{{ title }}</h2>
-    <table>
-      <thead>
-      <tr>
-        <th v-for="(header, index) in headers" :key="index">{{ header }}</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr v-for="(row, rowIndex) in data" :key="rowIndex">
-        <td v-for="(value, columnIndex) in row" :key="columnIndex">
-          {{value}}
-        </td>
-      </tr>
-      </tbody>
-    </table>
+    <h2 class="text-2xl font-bold mb-4">{{ title }}</h2>
+    <div class="overflow-x-auto">
+      <table class="table-auto border-collapse w-full">
+        <thead>
+        <tr>
+          <th v-for="(header, index) in headers" :key="index"
+              class="px-4 py-2 bg-gray-200 text-gray-700 uppercase font-bold text-sm border-b">
+            {{ header }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(row, rowIndex) in data" :key="rowIndex" class="text-gray-700 border-b hover:bg-gray-100">
+          <td v-for="(value, columnIndex) in row" :key="columnIndex" class="px-4 py-2 border">
+            {{value}}
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -63,23 +67,4 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos opcionales para tu tabla */
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-th {
-  background-color: #f2f2f2;
-}
-
-.table-title {
-  margin-top: 20px; /* Agregar espacio entre el título y la tabla */
-}
 </style>
