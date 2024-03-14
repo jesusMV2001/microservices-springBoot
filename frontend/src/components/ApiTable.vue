@@ -156,14 +156,7 @@ export default {
       this.rowIndexToDelete = null;
     },
     crearImplementacion() {
-      axios.post('URL_DE_LA_API_PARA_CREAR_IMPLEMENTACION', /* Datos de la nueva implementación */)
-          .then(response => {
-            // Actualizar los datos de la tabla con la nueva implementación
-            this.fetchData();
-          })
-          .catch(error => {
-            console.error('Error creating implementation:', error);
-          });
+      //TODO crear implementacion
     }
   }
 };
