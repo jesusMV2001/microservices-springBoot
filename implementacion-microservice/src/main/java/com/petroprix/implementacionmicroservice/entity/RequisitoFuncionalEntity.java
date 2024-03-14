@@ -1,7 +1,6 @@
 package com.petroprix.implementacionmicroservice.entity;
 
 
-import com.petroprix.implementacionmicroservice.collection.HistoricoComentarios;
 import com.petroprix.implementacionmicroservice.controller.dto.DTORequisitoFuncional;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

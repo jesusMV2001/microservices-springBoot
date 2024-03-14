@@ -69,14 +69,14 @@ export default {
           });
     },
     verRequisitosTecnicos(rowIndex){
-      let id = this.data.at(rowIndex).Id;
+      let id = this.data.at(rowIndex).id;
       this.$router.push({
         name: 'RT',
         params: {id}
       });
     },
     verComentarios(rowIndex){
-      let id = this.data.at(rowIndex).Id;
+      let id = this.data.at(rowIndex).id;
       this.$router.push({
         name: 'Comentarios',
         params: {id}

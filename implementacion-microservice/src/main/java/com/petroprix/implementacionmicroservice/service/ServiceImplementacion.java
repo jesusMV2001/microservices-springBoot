@@ -7,11 +7,12 @@ import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.properties.ListNumberingType;
 import com.itextpdf.layout.properties.UnitValue;
 import com.petroprix.implementacionmicroservice.controller.dto.*;
-import com.petroprix.implementacionmicroservice.collection.HistoricoComentarios;
+import com.petroprix.implementacionmicroservice.entity.HistoricoComentarios;
 import com.petroprix.implementacionmicroservice.entity.ImplementacionEntity;
 import com.petroprix.implementacionmicroservice.collection.RegistroCambios;
 import com.petroprix.implementacionmicroservice.entity.RequisitoFuncionalEntity;
 import com.petroprix.implementacionmicroservice.entity.RequisitoTecnicoEntity;
+import com.petroprix.implementacionmicroservice.repository.HistoricoComentariosRepository;
 import com.petroprix.implementacionmicroservice.repository.ImplementacionRepository;
 import com.petroprix.implementacionmicroservice.repository.RequisitoFuncionalRepository;
 import com.petroprix.implementacionmicroservice.repository.RequisitoTecnicoRepository;
@@ -46,6 +47,8 @@ public class ServiceImplementacion {
     RequisitoFuncionalRepository requisitoFuncionalRepository;
     @Autowired
     RequisitoTecnicoRepository requisitoTecnicoRepository;
+    @Autowired
+    HistoricoComentariosRepository historicoComentariosRepository;
 
     public List<ImplementacionEntity> verImplementaciones(){
         return implementacionRepository.findAll();
@@ -134,9 +137,17 @@ public class ServiceImplementacion {
             if(null == comentario.getFecha())
                 comentario.setFecha(LocalDateTime.now());
 
+            historicoComentariosRepository.save(comentario);
+
             requisitoFuncionalEntity.getHistoricoComentarios().add(comentario);
             requisitoFuncionalRepository.save(requisitoFuncionalEntity);
         });
+    }
+
+    public void deleteComentario(Long id) {
+        Optional<HistoricoComentarios> c = historicoComentariosRepository.findById(id);
+
+        c.ifPresent(comentario -> historicoComentariosRepository.delete(comentario));
     }
 
     public List<HistoricoComentarios> verComentarios(Long requisitoFuncionalId) {
@@ -156,6 +167,18 @@ public class ServiceImplementacion {
             requisitoFuncional.getRequisitosTecnicos().add(requisitoTecnico);
             requisitoFuncionalRepository.save(requisitoFuncional);
         });
+    }
+
+    public void deleteRequisitoTecnico(Long id, Long rfId) {
+        Optional<RequisitoFuncionalEntity> rf = requisitoFuncionalRepository.findById(rfId);
+        Optional<RequisitoTecnicoEntity> rt = requisitoTecnicoRepository.findById(id);
+
+        rf.flatMap(funcional -> rt).ifPresent(requisito -> {
+            System.out.println(rf.get().getRequisitosTecnicos().remove(requisito));
+            requisitoFuncionalRepository.save(rf.get());
+            requisitoTecnicoRepository.delete(requisito);
+        });
+
     }
 
     public List<RequisitoTecnicoEntity> verRequisitosTecnicos(Long requisitoFuncionalId) {
@@ -375,4 +398,5 @@ public class ServiceImplementacion {
 
         return table;
     }
+
 }

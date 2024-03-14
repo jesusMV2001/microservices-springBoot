@@ -1,4 +1,4 @@
-package com.petroprix.implementacionmicroservice.collection;
+package com.petroprix.implementacionmicroservice.entity;
 
 import com.petroprix.implementacionmicroservice.controller.dto.DTOHistoricoComentarios;
 import com.sun.istack.NotNull;
@@ -6,15 +6,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Embeddable;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Embeddable
+@Entity
+@Table
 @Getter
 @Setter
 @NoArgsConstructor
 public class HistoricoComentarios {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String comentario;
     @NotNull

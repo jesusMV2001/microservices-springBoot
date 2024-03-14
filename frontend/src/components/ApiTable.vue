@@ -1,6 +1,7 @@
 <template>
   <div class="w-full">
     <h2 class="text-2xl font-bold mb-4">{{ title }}</h2>
+    <button @click="crearImplementacion" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">Añadir Implementación</button>
     <div class="overflow-x-auto">
       <table class="table-auto border-collapse w-full">
         <thead>
@@ -94,21 +95,21 @@ export default {
           });
     },
     verRequisitosFuncionales(rowIndex) {
-      let id = this.data.at(rowIndex).Id;
+      let id = this.data.at(rowIndex).id;
       this.$router.push({
         name: 'RF',
         params: {id}
       });
     },
     editar(rowIndex) {
-      let id = this.data.at(rowIndex).Id;
+      let id = this.data.at(rowIndex).id;
       this.$router.push({
         name: 'edit',
         params: {id}
       });
     },
     crearPDF(rowIndex) {
-      let id = this.data.at(rowIndex).Id;
+      let id = this.data.at(rowIndex).id;
       let nombre = this.data.at(rowIndex).nombre
 
       axios.get(`http://localhost:8080/api/implementacion/${id}/pdf/RT`, {
@@ -131,16 +132,15 @@ export default {
       this.rowIndexToDelete = rowIndex;
       this.showModal = true;
     },
-
     confirmDelete() {
       // Obtener el ID del elemento a eliminar
-      let id = this.data[this.rowIndexToDelete].Id;
+      let id = this.data[this.rowIndexToDelete].id;
 
       // Realizar la eliminación del elemento
       axios.delete(`http://localhost:8080/api/implementacion/${id}`)
           .then(() => {
             // Eliminar la fila de la tabla localmente si la solicitud al servidor fue exitosa
-            this.data = this.data.filter(item => item.Id !== id);
+            this.data = this.data.filter(item => item.id !== id);
             // Cerrar el modal después de eliminar
             this.closeModal();
           })
@@ -150,11 +150,20 @@ export default {
             this.closeModal();
           });
     },
-
     closeModal() {
       // Cerrar el modal y limpiar el índice de la fila a eliminar
       this.showModal = false;
       this.rowIndexToDelete = null;
+    },
+    crearImplementacion() {
+      axios.post('URL_DE_LA_API_PARA_CREAR_IMPLEMENTACION', /* Datos de la nueva implementación */)
+          .then(response => {
+            // Actualizar los datos de la tabla con la nueva implementación
+            this.fetchData();
+          })
+          .catch(error => {
+            console.error('Error creating implementation:', error);
+          });
     }
   }
 };
