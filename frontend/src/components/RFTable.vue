@@ -112,6 +112,8 @@ export default {
               const filteredRow = {};
               Object.entries(row).forEach(([key, value]) => {
                 if (!Array.isArray(value)) {
+                  if(typeof value === "string" && value.match('T\?\?:'))
+                    value = value.split('T')[0]
                   filteredRow[key] = value;
                 }
               });
