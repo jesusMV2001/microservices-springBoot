@@ -1,6 +1,10 @@
 <template>
-  <div class="w-full">
+  <div class="w-full" tabindex="0" @keydown.esc="mostrarFormulario=false">
     <h2 class="text-lg font-bold mb-4">{{ title }}</h2>
+    <button @click="mostrarFormulario = true"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">Añadir Requisito
+    </button>
+    <!-- Tabla con los datos -->
     <div class="overflow-x-auto">
       <table class="table-auto border-collapse w-full">
         <thead>
@@ -29,6 +33,40 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Modal con el formulario -->
+    <div v-if="mostrarFormulario" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+      <div class="bg-white rounded-lg p-8 w-1/2">
+        <h3 class="text-lg font-bold mb-4">Nuevo Comentario</h3>
+        <form @submit.prevent="crearRF">
+          <div class="mb-4">
+            <label for="titulo" class="block text-gray-700 text-sm font-bold mb-2">Título:</label>
+            <input id="titulo" v-model="nuevoRF.titulo" required
+                      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+            <label for="descripcion" class="block text-gray-700 text-sm font-bold mb-2" >Descripción:</label>
+            <textarea id="descripcion" v-model="nuevoRF.descripcion"
+                      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+            <label for="reglas" class="block text-gray-700 text-sm font-bold mb-2">Reglas:</label>
+            <textarea id="reglas" v-model="nuevoRF.reglas" required
+                      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow" />
+            <label for="estado" class="block text-gray-700 text-sm font-bold mb-2" >Estado:</label>
+            <select id="estado" v-model="nuevoRF.estado" required
+                    class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">>
+              <option value="creado">Creado</option>
+              <option value="pendiente de validar">Pendiente de validar</option>
+              <option value="validado">Validado</option>
+            </select>
+            <label for="fecha" class="block text-gray-700 text-sm font-bold mb-2">Fecha:</label>
+            <input type="date" id="fecha" v-model="nuevoRF.fechaCreacion" required
+                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+          </div>
+          <div class="flex justify-end">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Enviar</button>
+            <button @click="mostrarFormulario=false" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -47,7 +85,18 @@ export default {
       headers: [],
       data: [],
       sortByColumn: '', // Columna actualmente ordenada
-      sortDirection: 'asc' // Dirección de ordenamiento
+      sortDirection: 'asc', // Dirección de ordenamiento
+      mostrarFormulario: false,
+      tiposReglas: {
+
+      },
+      nuevoRF: {
+        titulo: '',
+        descripcion: '',
+        reglas: '',
+        estado: '',
+          fechaCreacion: new Date().toISOString().substring(0, 10)
+      }
     };
   },
   mounted() {
@@ -95,6 +144,25 @@ export default {
         name: 'Comentarios',
         params: {id}
       });
+    },
+    crearRF(){
+      this.nuevoRF.fechaCreacion = new Date(this.nuevoRF.fechaCreacion)
+      const id = this.$route.params.id;
+      axios.post(`http://localhost:8080/api/implementacion/${id}/RequisitoFuncional`, this.nuevoRF)
+          .then(() => {
+            this.mostrarFormulario=false
+            this.fetchData('http://localhost:8080/api/implementacion/'+id+'/RequisitoFuncional')
+            this.nuevoRF = {
+              titulo: '',
+                  descripcion: '',
+                  reglas: '',
+                  estado: '',
+                  fechaCreacion: new Date().toISOString().substring(0, 10)
+            }
+          })
+          .catch(error => {
+            console.error('Error al enviar el comentario:', error);
+          });
     }
   },
   computed: {

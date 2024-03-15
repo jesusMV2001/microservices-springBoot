@@ -5,6 +5,7 @@
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">Añadir Requisito
     </button>
 
+    <!-- Modal con el formulario -->
     <div v-if="mostrarFormulario"
          class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
       <div class="bg-white rounded-lg p-8 w-1/2">
@@ -26,6 +27,7 @@
       </div>
     </div>
 
+    <!-- Tabla con los datos -->
     <div class="overflow-x-auto">
       <table class="table-auto border-collapse w-full">
         <thead>
