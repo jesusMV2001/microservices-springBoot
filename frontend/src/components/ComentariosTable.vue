@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full" tabindex="0" @keydown.esc="cancelarComentario">
+  <div class="w-full" tabindex="0" @keydown.esc="mostrarFormulario=false">
     <h2 class="text-2xl font-bold mb-4">{{ title }}</h2>
     <button @click="mostrarFormulario = true"
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">Añadir Comentario
@@ -18,7 +18,7 @@
           </div>
           <div class="flex justify-end">
             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Enviar</button>
-            <button @click="cancelarComentario" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Cancelar</button>
+            <button @click="mostrarFormulario=false" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Cancelar</button>
           </div>
         </form>
       </div>
@@ -28,14 +28,17 @@
       <table class="table-auto border-collapse w-full">
         <thead>
         <tr>
-          <th v-for="(header, index) in headers" :key="index"
+          <th v-for="(header, index) in headers" :key="index" @click="sortBy(header)" :class="{ 'by-gray-200': header === sortByColumn }"
               class="px-4 py-2 bg-gray-200 text-gray-700 uppercase font-bold text-sm border-b">
-            {{ header }}</th>
+            {{ header }}
+            <span v-if="header === sortByColumn" :class="sortDirection === 'asc' ? 'inline' : 'hidden'" >▲</span>
+            <span v-if="header === sortByColumn" :class="sortDirection === 'desc' ? 'inline' : 'hidden'" >▼</span>
+          </th>
           <th class="px-4 py-2 bg-gray-200 text-gray-700 uppercase font-bold text-sm border-b">Acciones</th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(row, rowIndex) in data" :key="rowIndex" class="text-gray-700 border-b hover:bg-gray-100">
+        <tr v-for="(row, rowIndex) in sortedData" :key="rowIndex" class="text-gray-700 border-b hover:bg-gray-100">
           <td v-for="(value, columnIndex) in row" :key="columnIndex" class="px-4 py-2 border">
             {{value}}
           </td>
@@ -68,7 +71,9 @@ export default {
       nuevoComentario: {
         comentario: '',
         fecha: new Date().toISOString().substring(0, 10)
-      }
+      },
+      sortByColumn: '',
+      sortDirection: 'asc'
     };
   },
   mounted() {
@@ -103,23 +108,44 @@ export default {
             this.mostrarFormulario=false
             const id = this.$route.params.id;
             this.fetchData(`http://localhost:8080/api/implementacion/RequisitoFuncional/${id}/Comentario`)
+            this.nuevoComentario= {
+              comentario: '',
+              fecha: new Date().toISOString().substring(0, 10)
+            }
           })
           .catch(error => {
             console.error('Error al enviar el comentario:', error);
           });
-    },
-    cancelarComentario(){
-      this.mostrarFormulario=false
     },
     eliminarComentario(rowIndex){
       axios.delete(`http://localhost:8080/api/implementacion/RequisitoFuncional/Comentario/${this.data.at(rowIndex).id}`)
           .then(() => {
             const id = this.$route.params.id;
             this.fetchData(`http://localhost:8080/api/implementacion/RequisitoFuncional/${id}/Comentario`)
+
           })
           .catch(error => {
             console.error('Error al enviar el comentario:', error);
           });
+    },
+    sortBy(column){
+      if(column === this.sortByColumn)
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc'
+      else {
+        this.sortByColumn = column
+        this.sortDirection = 'asc'
+      }
+    }
+  },
+  computed: {
+    sortedData(){
+      return this.data.slice().sort((a,b) =>{
+        const aValue = a[this.sortByColumn]
+        const bValue = b[this.sortByColumn]
+        if(aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1
+        if(aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1
+        return 0
+      })
     }
   }
 };

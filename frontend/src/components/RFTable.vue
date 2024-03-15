@@ -5,15 +5,19 @@
       <table class="table-auto border-collapse w-full">
         <thead>
         <tr>
-          <th v-for="(header, index) in headers" :key="index"
-              class="px-4 py-2 bg-gray-200 text-gray-700 uppercase font-bold text-sm border-b">{{ header }}</th>
+          <th v-for="(header, index) in headers" :key="index" @click="sortBy(header)" :class="{ 'bg-gray-200': header === sortByColumn }"
+              class="px-4 py-2 bg-gray-200 text-gray-700 uppercase font-bold text-sm border-b">
+            {{ header }}
+            <span v-if="header === sortByColumn" :class="sortDirection === 'asc' ? 'inline' : 'hidden'">▲</span>
+            <span v-if="header === sortByColumn" :class="sortDirection === 'desc' ? 'inline' : 'hidden'">▼</span>
+          </th>
           <th class="px-4 py-2 bg-gray-200 text-gray-700 uppercase font-bold text-sm border-b">Acciones</th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(row, rowIndex) in data" :key="rowIndex" class="text-gray-700 border-b hover:bg-gray-100">
+        <tr v-for="(row, rowIndex) in sortedData" :key="rowIndex" class="text-gray-700 border-b hover:bg-gray-100">
           <td v-for="(value, columnIndex) in row" :key="columnIndex"  class="px-4 py-2 border">
-            {{value}}
+            {{ value }}
           </td>
           <td class="px-4 py-2 border">
             <button @click="verRequisitosTecnicos(rowIndex)"
@@ -41,7 +45,9 @@ export default {
   data() {
     return {
       headers: [],
-      data: []
+      data: [],
+      sortByColumn: '', // Columna actualmente ordenada
+      sortDirection: 'asc' // Dirección de ordenamiento
     };
   },
   mounted() {
@@ -68,6 +74,14 @@ export default {
             console.error('Error fetching data:', error);
           });
     },
+    sortBy(column) {
+      if (column === this.sortByColumn) {
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.sortByColumn = column;
+        this.sortDirection = 'asc';
+      }
+    },
     verRequisitosTecnicos(rowIndex){
       let id = this.data.at(rowIndex).id;
       this.$router.push({
@@ -80,6 +94,17 @@ export default {
       this.$router.push({
         name: 'Comentarios',
         params: {id}
+      });
+    }
+  },
+  computed: {
+    sortedData() {
+      return this.data.slice().sort((a, b) => {
+        const aValue = a[this.sortByColumn];
+        const bValue = b[this.sortByColumn];
+        if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
+        return 0;
       });
     }
   }

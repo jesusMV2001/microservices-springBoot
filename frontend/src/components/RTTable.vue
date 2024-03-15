@@ -12,7 +12,7 @@
         <form @submit.prevent="crearRT" >
           <div class="mb-4">
             <label for="titulo" class="block text-gray-700 text-sm font-bold mb-2">titulo:</label>
-            <input id="titulo" v-model="nuevoRT.titulo" required @keydown.esc="cancelarRT"
+            <input id="titulo" v-model="nuevoRT.titulo" required
                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
             <label for="descripcion" class="block text-gray-700 text-sm font-bold mb-2">descripcion:</label>
             <textarea id="descripcion" v-model="nuevoRT.descripcion" required
@@ -30,14 +30,17 @@
       <table class="table-auto border-collapse w-full">
         <thead>
         <tr>
-          <th v-for="(header, index) in headers" :key="index"
+          <th v-for="(header, index) in headers" :key="index" @click="sortBy(header)" :class="{ 'bg-gray-200': header === sortByColumn }"
               class="px-4 py-2 bg-gray-200 text-gray-700 uppercase font-bold text-sm border-b">
-            {{ header }}</th>
+            {{ header }}
+            <span v-if="header === sortByColumn" :class="sortDirection === 'asc' ? 'inline' : 'hidden'">▲</span>
+            <span v-if="header === sortByColumn" :class="sortDirection === 'desc' ? 'inline' : 'hidden'">▼</span>
+          </th>
           <th class="px-4 py-2 bg-gray-200 text-gray-700 uppercase font-bold text-sm border-b">Acciones</th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(row, rowIndex) in data" :key="rowIndex"
+        <tr v-for="(row, rowIndex) in sortedData" :key="rowIndex"
             class="text-gray-700 border-b hover:bg-gray-100">
           <td v-for="(value, columnIndex) in row" :key="columnIndex"
               class="px-4 py-2 border">{{ value }}</td>
@@ -71,7 +74,9 @@ export default {
       nuevoRT: {
         titulo: '',
         descripcion: ''
-      }
+      },
+      sortByColumn: '',
+      sortDirection: 'asc'
     };
   },
   mounted() {
@@ -104,6 +109,10 @@ export default {
             this.mostrarFormulario=false
             const id = this.$route.params.id;
             this.fetchData(`http://localhost:8080/api/implementacion/RequisitoFuncional/${id}/RequisitoTecnico`)
+            this.nuevoRT = {
+              titulo: '',
+                  descripcion: ''
+            }
           })
           .catch(error => {
             console.error('Error al enviar el comentario:', error);
@@ -121,6 +130,27 @@ export default {
           .catch(error => {
             console.error('Error al enviar el comentario:', error);
           });
+    },
+    sortBy(column) {
+      if (column === this.sortByColumn) {
+        //cambiar la dirección de ordenamiento si se hace clic en la misma columna
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        //establecer la nueva columna de ordenamiento y la dirección predeterminada ascendente
+        this.sortByColumn = column;
+        this.sortDirection = 'asc';
+      }
+    }
+  },
+  computed: {
+    sortedData() {
+      return this.data.slice().sort((a, b) => {
+        const aValue = a[this.sortByColumn];
+        const bValue = b[this.sortByColumn];
+        if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
     }
   }
 };

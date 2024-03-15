@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import ApiTable from '@/components/ApiTable.vue'
+import ApiTable from '@/components/ImplementacionTable.vue'
 import RFTable from '@/components/RFTable.vue'
 import formImplementacion from "@/components/EditarImplementacion.vue";
 import RTTable from "@/components/RTTable.vue";
