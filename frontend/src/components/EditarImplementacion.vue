@@ -40,8 +40,6 @@
         </ul>
       </div>
 
-
-
       <div class="flex items-center justify-between">
         <button type="submit"
                 class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
@@ -49,6 +47,16 @@
         </button>
       </div>
     </form>
+
+
+    <!-- Mostrar mensaje si se ha guardado exitosamente -->
+    <div v-if="mostrarMensaje" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+      <strong class="font-bold">Éxito:</strong>
+      <span class="block sm:inline">La implementación se ha guardado exitosamente.</span>
+      <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+        <svg @click="mostrarMensaje = false" class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a.5.5 0 01-.708 0L10 10.707l-3.646 3.646a.5.5 0 01-.708-.708L9.293 10 5.646 6.354a.5.5 0 01.708-.708L10 9.293l3.646-3.647a.5.5 0 01.708.708L10.707 10l3.647 3.646a.5.5 0 010 .708z"/></svg>
+      </span>
+    </div>
   </div>
 
 </template>
@@ -66,7 +74,8 @@ export default {
       descripcion: '',
       alcance: '',
       requisitosFuncionales: [],
-      rfEliminados: []
+      rfEliminados: [],
+      mostrarMensaje: false
     };
   },
   mounted() {
@@ -108,8 +117,8 @@ export default {
       this.data.requisitoFuncional = this.requisitosFuncionales.filter((_, index) => !indicesBorrar.includes(index))
 
       axios.put(`http://localhost:8080/api/implementacion`, this.data)
-          .then(response =>{
-
+          .then(() =>{
+            this.mostrarMensaje=true
           })
           .catch(error => {
             console.error('Error updating data:', error);
