@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full" tabindex="0" @keydown.esc="mostrarFormulario=false">
+  <div class="w-full" @keydown.esc="mostrarFormulario=false">
     <h2 class="text-2xl font-bold mb-4">{{ title }}</h2>
     <button @click="mostrarFormulario = true"
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">Añadir Comentario
@@ -101,6 +101,11 @@ export default {
             this.headers = Object.keys(this.data[0]);
           })
           .catch(error => {
+            if (error.response.status === 404)
+                // Redirigir a la página NotFound si no hay datos en la respuesta
+              this.$router.push({
+                name: 'NotFound'
+              });
             console.error('Error fetching data:', error);
           });
     },

@@ -36,6 +36,7 @@ public class ImplementacionEntity {
         this.version=implementacion.version();
         this.descripcion=implementacion.descripcion();
         this.alcance=implementacion.alcance();
+        this.fecha=implementacion.fecha();
         if(null == implementacion.requisitoFuncional())
             this.requisitoFuncionalEntityList=new ArrayList<>();
         else

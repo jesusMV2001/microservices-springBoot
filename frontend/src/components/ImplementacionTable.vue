@@ -1,7 +1,7 @@
 <template>
-  <div class="w-full">
+  <div class="w-full" @keydown.esc="mostrarFormulario=false; showModal=false">
     <h2 class="text-2xl font-bold mb-4">{{ title }}</h2>
-    <button @click="crearImplementacion" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">Añadir Implementación</button>
+    <button @click="mostrarFormulario=true" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">Añadir Implementación</button>
     <div class="overflow-x-auto">
       <table class="table-auto border-collapse w-full">
         <thead>
@@ -51,6 +51,37 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal con el formulario -->
+  <div v-if="mostrarFormulario" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+    <div class="bg-white rounded-lg p-8 w-1/2">
+      <h3 class="text-lg font-bold mb-4">Nuevo Comentario</h3>
+      <form @submit.prevent="crearImplementacion">
+        <div class="mb-4">
+          <label for="nombre" class="block text-gray-700 text-sm font-bold mb-2">Nombre:</label>
+          <input id="nombre" v-model="nuevaImplementacion.nombre" required
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"  />
+          <label for="version" class="block text-gray-700 text-sm font-bold mb-2">Version:</label>
+          <input id="version" v-model="nuevaImplementacion.version" required
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"  />
+          <label for="fecha" class="block text-gray-700 text-sm font-bold mb-2">Fecha:</label>
+          <input type="date" id="fecha" v-model="nuevaImplementacion.fecha" required
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+          <label for="descripcion" class="block text-gray-700 text-sm font-bold mb-2">Descripción:</label>
+          <textarea id="descripcion" v-model="nuevaImplementacion.descripcion" required
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+          <label for="alcance" class="block text-gray-700 text-sm font-bold mb-2">Alcance:</label>
+          <textarea id="alcance" v-model="nuevaImplementacion.alcance" required
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+        </div>
+        <div class="flex justify-end">
+          <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Enviar</button>
+          <button @click="mostrarFormulario=false" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </template>
 
 <script>
@@ -74,7 +105,15 @@ export default {
       showModal: false,
       rowIndexToDelete: null,
       sortByColumn: '',
-      sortDirection: 'asc'
+      sortDirection: 'asc',
+      mostrarFormulario: false,
+      nuevaImplementacion: {
+        nombre: '',
+        version: '',
+        fecha: new Date().toISOString().substring(0, 10),
+        descripcion: '',
+        alcance: ''
+      }
     };
   },
   mounted() {
@@ -164,7 +203,22 @@ export default {
       this.rowIndexToDelete = null;
     },
     crearImplementacion() {
-      //TODO crear implementacion
+      this.nuevaImplementacion.fecha = new Date(this.nuevaImplementacion.fecha)
+      axios.post(`http://localhost:8080/api/implementacion`, this.nuevaImplementacion)
+          .then(() => {
+            this.mostrarFormulario=false
+            this.fetchData(`http://localhost:8080/api/implementacion/RequisitoFuncional`)
+            this.nuevaImplementacion= {
+                  nombre: '',
+                  version: '',
+                  fecha: new Date().toISOString().substring(0, 10),
+                  descripcion: '',
+                  alcance: ''
+            }
+          })
+          .catch(error => {
+            console.error('Error al enviar el comentario:', error);
+          });
     },
     sortBy(column){
       if(column === this.sortByColumn)

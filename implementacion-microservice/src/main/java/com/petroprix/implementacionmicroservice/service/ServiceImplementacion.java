@@ -185,11 +185,12 @@ public class ServiceImplementacion {
         });
     }
 
-    public List<HistoricoComentarios> verComentarios(Long requisitoFuncionalId) {
+    public ResponseEntity<List<DTOHistoricoComentarios>> verComentarios(Long requisitoFuncionalId) {
         Optional<RequisitoFuncionalEntity> requisitoFuncionalEntity = requisitoFuncionalRepository.findById(requisitoFuncionalId);
 
-        return requisitoFuncionalEntity.map(RequisitoFuncionalEntity::getHistoricoComentarios).
-                orElseThrow();
+        return requisitoFuncionalEntity.map(rf -> ResponseEntity.ok().body(
+                    rf.getHistoricoComentarios().stream().map(DTOHistoricoComentarios::new).toList())).
+                orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     public void addRequisitoTecnico(Long requisitoFuncionalId, DTORequisitoTecnico dtoRequisitoTecnico) {
@@ -216,11 +217,12 @@ public class ServiceImplementacion {
 
     }
 
-    public List<RequisitoTecnicoEntity> verRequisitosTecnicos(Long requisitoFuncionalId) {
+    public ResponseEntity<List<DTORequisitoTecnico>> verRequisitosTecnicos(Long requisitoFuncionalId) {
         Optional<RequisitoFuncionalEntity> requisitoFuncionalEntity = requisitoFuncionalRepository.findById(requisitoFuncionalId);
 
-        return requisitoFuncionalEntity.map(RequisitoFuncionalEntity::getRequisitosTecnicos).
-                orElseThrow();
+        return requisitoFuncionalEntity.map(rf -> ResponseEntity.ok().body(
+                        rf.getRequisitosTecnicos().stream().map(DTORequisitoTecnico::new).toList())).
+                orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**

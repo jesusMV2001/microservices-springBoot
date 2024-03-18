@@ -1,6 +1,24 @@
 <template>
   <h2 class="text-2xl font-bold mb-4">Formulario de Implementación</h2>
   <div class="max-w-md mx-auto">
+    <!-- Mostrar mensaje si se ha guardado exitosamente -->
+    <div v-if="mostrarMensaje" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+      <strong class="font-bold">Éxito:</strong>
+      <span class="block sm:inline">La implementación se ha guardado exitosamente.</span>
+      <span class="absolute top-0 bottom-0 -right-3.5 px-4 py-3">
+        <svg @click="mostrarMensaje = false" class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a.5.5 0 01-.708 0L10 10.707l-3.646 3.646a.5.5 0 01-.708-.708L9.293 10 5.646 6.354a.5.5 0 01.708-.708L10 9.293l3.646-3.647a.5.5 0 01.708.708L10.707 10l3.647 3.646a.5.5 0 010 .708z"/></svg>
+      </span>
+    </div>
+
+    <!-- Mostrar mensaje de error si se produce un error -->
+    <div v-if="mostrarError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <strong class="font-bold">Error:</strong>
+      <span class="block sm:inline">Se produjo un error al guardar la implementación.</span>
+      <span class="absolute top-0 bottom-0 -right-3.5 px-4 py-3">
+        <svg @click="mostrarError = false" class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a.5.5 0 01-.708 0L10 10.707l-3.646 3.646a.5.5 0 01-.708-.708L9.293 10 5.646 6.354a.5.5 0 01.708-.708L10 9.293l3.646-3.647a.5.5 0 01.708.708L10.707 10l3.647 3.646a.5.5 0 010 .708z"/></svg>
+      </span>
+    </div>
+
     <form @submit.prevent="submitForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8">
       <div class="mb-4">
         <label for="nombre" class="block text-gray-700 text-sm font-bold mb-2">Nombre:</label>
@@ -49,14 +67,7 @@
     </form>
 
 
-    <!-- Mostrar mensaje si se ha guardado exitosamente -->
-    <div v-if="mostrarMensaje" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-      <strong class="font-bold">Éxito:</strong>
-      <span class="block sm:inline">La implementación se ha guardado exitosamente.</span>
-      <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-        <svg @click="mostrarMensaje = false" class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a.5.5 0 01-.708 0L10 10.707l-3.646 3.646a.5.5 0 01-.708-.708L9.293 10 5.646 6.354a.5.5 0 01.708-.708L10 9.293l3.646-3.647a.5.5 0 01.708.708L10.707 10l3.647 3.646a.5.5 0 010 .708z"/></svg>
-      </span>
-    </div>
+
   </div>
 
 </template>
@@ -75,7 +86,8 @@ export default {
       alcance: '',
       requisitosFuncionales: [],
       rfEliminados: [],
-      mostrarMensaje: false
+      mostrarMensaje: false,
+      mostrarError:false
     };
   },
   mounted() {
@@ -102,6 +114,11 @@ export default {
             this.fecha=`${year}-${month}-${day}`
           })
           .catch(error => {
+            if (error.response.status === 404)
+                // Redirigir a la página NotFound si no hay datos en la respuesta
+              this.$router.push({
+                name: 'NotFound'
+              });
             console.error('Error fetching data:', error);
           });
     },
@@ -119,8 +136,11 @@ export default {
       axios.put(`http://localhost:8080/api/implementacion`, this.data)
           .then(() =>{
             this.mostrarMensaje=true
+            const id = this.$route.params.id;
+            this.fetchData('http://localhost:8080/api/implementacion/'+id);
           })
           .catch(error => {
+            this.mostrarError=true
             console.error('Error updating data:', error);
           })
     },

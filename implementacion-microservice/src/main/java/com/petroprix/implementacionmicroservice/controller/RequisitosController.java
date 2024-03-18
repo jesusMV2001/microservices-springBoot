@@ -88,8 +88,8 @@ public class RequisitosController {
     }
 
     @GetMapping("/RequisitoFuncional/{RequisitoFuncionalId}/Comentario")
-    private List<DTOHistoricoComentarios> verComentarios(@PathVariable Long RequisitoFuncionalId){
-        return serviceImplementacion.verComentarios(RequisitoFuncionalId).stream().map(DTOHistoricoComentarios::new).toList();
+    private ResponseEntity<List<DTOHistoricoComentarios>> verComentarios(@PathVariable Long RequisitoFuncionalId){
+        return serviceImplementacion.verComentarios(RequisitoFuncionalId);
     }
 
     @PostMapping("/RequisitoFuncional/{RequisitoFuncionalId}/RequisitoTecnico")
@@ -103,8 +103,8 @@ public class RequisitosController {
     }
 
     @GetMapping("/RequisitoFuncional/{RequisitoFuncionalId}/RequisitoTecnico")
-    private List<DTORequisitoTecnico> verRequisitosTecnicos(@PathVariable Long RequisitoFuncionalId){
-        return serviceImplementacion.verRequisitosTecnicos(RequisitoFuncionalId).stream().map(DTORequisitoTecnico::new).toList();
+    private ResponseEntity<List<DTORequisitoTecnico>> verRequisitosTecnicos(@PathVariable Long RequisitoFuncionalId){
+        return serviceImplementacion.verRequisitosTecnicos(RequisitoFuncionalId);
     }
 
 }

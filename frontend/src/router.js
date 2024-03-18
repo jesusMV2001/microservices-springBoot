@@ -4,6 +4,7 @@ import RFTable from '@/components/RFTable.vue'
 import formImplementacion from "@/components/EditarImplementacion.vue";
 import RTTable from "@/components/RTTable.vue";
 import ComentariosTable from "@/components/ComentariosTable.vue";
+import NotFound from "@/components/NotFound.vue";
 
 const routes = [
     {
@@ -42,6 +43,11 @@ const routes = [
         props: {
             title: 'Comentarios'
         }
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: NotFound
     }
 ]
 
