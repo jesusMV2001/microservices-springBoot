@@ -99,12 +99,21 @@ export default {
     submitForm() {
       this.data.nombre = this.nombre
       this.data.version = this.version
-      this.data.fecha = this.fecha
+      this.data.fecha = new Date(this.fecha)
       this.data.descripcion = this.descripcion
       this.data.alcance = this.alcance
 
-      //TODO hacer peticion a la api
-      console.log("aa");
+      //obtiene los indices de los rf a eliminar
+      let indicesBorrar = this.rfEliminados.map((value, index) => value ? index : -1).filter(index => index !== -1);
+      this.data.requisitoFuncional = this.requisitosFuncionales.filter((_, index) => !indicesBorrar.includes(index))
+
+      axios.put(`http://localhost:8080/api/implementacion`, this.data)
+          .then(response =>{
+
+          })
+          .catch(error => {
+            console.error('Error updating data:', error);
+          })
     },
     eliminarRequisitoFuncional(id) {
       let index = this.requisitosFuncionales.findIndex(value => value.id === id);

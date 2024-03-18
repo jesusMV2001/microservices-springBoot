@@ -28,11 +28,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import com.itextpdf.layout.Document;
 import org.springframework.http.HttpHeaders;
@@ -84,6 +86,24 @@ public class ServiceImplementacion {
         implementacionEntity.getRegistroCambiosEntities().add(r);
 
         return implementacionRepository.save(implementacionEntity);
+    }
+
+    public void actualizarImplementacion(DTOImplementacion implementacion) {
+        Optional<ImplementacionEntity> implementacionEntity = implementacionRepository.findById(implementacion.id());
+
+        implementacionEntity.ifPresent(i -> {
+            i.setNombre(implementacion.nombre());
+            i.setVersion(implementacion.version());
+            i.setFecha(implementacion.fecha());
+            i.setDescripcion(implementacion.descripcion());
+            i.setAlcance(implementacion.alcance());
+
+            Set<Long> nuevosIdsRequisitosFuncionales = implementacion.requisitoFuncional().stream()
+                    .map(DTORequisitoFuncional::id).collect(Collectors.toSet());
+            i.getRequisitoFuncionalEntityList().removeIf(rf  -> !nuevosIdsRequisitosFuncionales.contains(rf.getId()));
+
+            implementacionRepository.save(i);
+        });
     }
 
     public void borrarImplementacion(Long id) {
@@ -154,10 +174,15 @@ public class ServiceImplementacion {
         });
     }
 
-    public void deleteComentario(Long id) {
-        Optional<HistoricoComentarios> c = historicoComentariosRepository.findById(id);
+    public void deleteComentario(Long id, Long comentarioId) {
+        Optional<RequisitoFuncionalEntity> rf = requisitoFuncionalRepository.findById(id);
+        Optional<HistoricoComentarios> c = historicoComentariosRepository.findById(comentarioId);
 
-        c.ifPresent(comentario -> historicoComentariosRepository.delete(comentario));
+        rf.flatMap(funcional -> c).ifPresent(comentario ->{
+            rf.get().getHistoricoComentarios().remove(comentario);
+            requisitoFuncionalRepository.save(rf.get());
+            historicoComentariosRepository.delete(comentario);
+        });
     }
 
     public List<HistoricoComentarios> verComentarios(Long requisitoFuncionalId) {
@@ -408,4 +433,6 @@ public class ServiceImplementacion {
 
         return table;
     }
+
+
 }

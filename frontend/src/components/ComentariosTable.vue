@@ -121,11 +121,12 @@ export default {
           });
     },
     eliminarComentario(rowIndex){
-      axios.delete(`http://localhost:8080/api/implementacion/RequisitoFuncional/Comentario/${this.data.at(rowIndex).id}`)
-          .then(() => {
-            const id = this.$route.params.id;
-            this.fetchData(`http://localhost:8080/api/implementacion/RequisitoFuncional/${id}/Comentario`)
+      let id = this.$route.params.id
+      let comentarioId = this.data.at(rowIndex).id
 
+      axios.delete(`http://localhost:8080/api/implementacion/RequisitoFuncional/${id}/Comentario/${comentarioId}`)
+          .then(() => {
+            this.fetchData(`http://localhost:8080/api/implementacion/RequisitoFuncional/${id}/Comentario`)
           })
           .catch(error => {
             console.error('Error al enviar el comentario:', error);

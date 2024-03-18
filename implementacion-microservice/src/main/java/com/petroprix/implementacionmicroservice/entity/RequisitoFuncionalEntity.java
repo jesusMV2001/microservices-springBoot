@@ -26,7 +26,7 @@ public class RequisitoFuncionalEntity {
     private String reglas;
     private String estado;
     private LocalDateTime fechaCreacion;
-    @ElementCollection
+    @OneToMany
     private List<HistoricoComentarios> historicoComentarios;
     @OneToMany
     private List<RequisitoTecnicoEntity> requisitosTecnicos;
