@@ -62,6 +62,11 @@ public class RequisitosController {
         serviceImplementacion.addRequisito(id, requisitoFuncional);
     }
 
+    @DeleteMapping("/{id}/RequisitoFuncional/{idRF}")
+    private void deleteRequisitoFuncional(@PathVariable Long id, @PathVariable Long idRF){
+        serviceImplementacion.deleteRequisitoFuncional(id, idRF);
+    }
+
     @GetMapping("/{id}/RequisitoFuncional")
     private ResponseEntity<List<DTORequisitoFuncional>> verRequisitosFuncionales(@PathVariable Long id){
         return serviceImplementacion.verRequisitoFuncional(id);

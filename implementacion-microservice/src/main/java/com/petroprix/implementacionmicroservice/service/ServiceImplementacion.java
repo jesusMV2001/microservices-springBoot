@@ -121,6 +121,16 @@ public class ServiceImplementacion {
         });
     }
 
+    public void deleteRequisitoFuncional(Long id, Long idRF) {
+        Optional<ImplementacionEntity> implementacion = implementacionRepository.findById(id);
+        Optional<RequisitoFuncionalEntity> requisitoFuncional = requisitoFuncionalRepository.findById(idRF);
+
+        implementacion.flatMap(implementacionEntity -> requisitoFuncional).ifPresent(rf -> {
+            implementacion.get().getRequisitoFuncionalEntityList().remove(rf);
+            requisitoFuncionalRepository.delete(rf);
+        });
+    }
+
     public ResponseEntity<List<DTORequisitoFuncional>> verRequisitoFuncional(Long id) {
         Optional<ImplementacionEntity> implementacionOptional = implementacionRepository.findById(id);
 
@@ -174,7 +184,7 @@ public class ServiceImplementacion {
         Optional<RequisitoTecnicoEntity> rt = requisitoTecnicoRepository.findById(id);
 
         rf.flatMap(funcional -> rt).ifPresent(requisito -> {
-            System.out.println(rf.get().getRequisitosTecnicos().remove(requisito));
+            rf.get().getRequisitosTecnicos().remove(requisito);
             requisitoFuncionalRepository.save(rf.get());
             requisitoTecnicoRepository.delete(requisito);
         });
@@ -398,5 +408,4 @@ public class ServiceImplementacion {
 
         return table;
     }
-
 }

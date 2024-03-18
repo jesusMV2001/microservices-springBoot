@@ -28,6 +28,9 @@
                     class="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Requisitos Tecnicos</button>
             <button @click="verComentarios(rowIndex)"
                     class="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Comentarios</button>
+            <button @click="eliminarRF(rowIndex)"
+                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Borrar</button>
+
           </td>
         </tr>
         </tbody>
@@ -68,6 +71,21 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal de confirmacion para borrar -->
+  <div v-if="mostrarConfirmacion" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="modal-content bg-white p-4 rounded shadow-lg">
+        <span class="close absolute top-0 right-0 m-4 text-gray-600 cursor-pointer"
+              @click="closeModal">&times;</span>
+      <p class="text-lg text-gray-800 mb-4">¿Está seguro que desea borrar este elemento?</p>
+      <div class="flex justify-end">
+        <button @click="confirmDelete"
+                class="mr-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Confirmar</button>
+        <button @click="closeModal"
+                class="bg-gray-400 hover:bg-gray-600 text-gray-800 font-bold py-2 px-4 rounded">Cancelar</button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -84,12 +102,12 @@ export default {
     return {
       headers: [],
       data: [],
+      mostrarConfirmacion: false,
+      rowIndexToDelete: null,
       sortByColumn: '', // Columna actualmente ordenada
       sortDirection: 'asc', // Dirección de ordenamiento
       mostrarFormulario: false,
-      tiposReglas: {
-
-      },
+      tiposReglas: {},
       nuevoRF: {
         titulo: '',
         descripcion: '',
@@ -165,6 +183,34 @@ export default {
           .catch(error => {
             console.error('Error al enviar el comentario:', error);
           });
+    },
+    eliminarRF(rowIndex) {
+      // Mostrar el modal de confirmación y almacenar el índice de la fila a eliminar
+      this.rowIndexToDelete = rowIndex;
+      this.mostrarConfirmacion = true;
+    },
+    confirmDelete() {
+      let idRF = this.data[this.rowIndexToDelete].id;
+      let id = this.$route.params.id
+
+      // Realizar la eliminación del elemento
+      axios.delete(`http://localhost:8080/api/implementacion/${id}/RequisitoFuncional/${idRF}`)
+          .then(() => {
+            // Eliminar la fila de la tabla localmente si la solicitud al servidor fue exitosa
+            this.data = this.data.filter(item => item.id !== idRF);
+            // Cerrar el modal después de eliminar
+            this.closeModal();
+          })
+          .catch(error => {
+            console.error('Error al eliminar el elemento:', error);
+            // Cerrar el modal en caso de error
+            this.closeModal();
+          });
+    },
+    closeModal() {
+      // Cerrar el modal y limpiar el índice de la fila a eliminar
+      this.mostrarConfirmacion = false;
+      this.rowIndexToDelete = null;
     }
   },
   computed: {

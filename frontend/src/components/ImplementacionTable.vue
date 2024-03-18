@@ -37,6 +37,7 @@
     </div>
   </div>
 
+  <!-- Modal de confirmacion para borrar -->
   <div v-if="showModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
     <div class="modal-content bg-white p-4 rounded shadow-lg">
         <span class="close absolute top-0 right-0 m-4 text-gray-600 cursor-pointer"
