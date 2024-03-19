@@ -63,20 +63,6 @@ public class ServiceImplementacion {
                 orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    public void cambiarImplementacion(Long id, DTOImplementacion implementacionDTO) {
-        Optional<ImplementacionEntity> implementacionEntity = implementacionRepository.findById(id);
-
-        implementacionEntity.ifPresent(i -> {
-            i.setNombre(implementacionDTO.nombre());
-            i.setAlcance(implementacionDTO.alcance());
-            i.setVersion(implementacionDTO.version());
-            i.setDescripcion(implementacionDTO.descripcion());
-            //i.getRegistroCambiosEntities().add();
-
-            implementacionRepository.save(i);
-        });
-    }
-
     public ImplementacionEntity crearImplementacion(DTOImplementacion implementacion){
         ImplementacionEntity implementacionEntity = new ImplementacionEntity(implementacion);
         if(null == implementacion.fecha())
@@ -138,6 +124,20 @@ public class ServiceImplementacion {
 
             implementacion.getRequisitoFuncionalEntityList().add(requisitoFuncionalEntity);
             implementacionRepository.save(implementacion);
+        });
+    }
+
+    public void actualizarRequisitoFuncional(Long id, DTORequisitoFuncional requisitoFuncional) {
+        Optional<RequisitoFuncionalEntity> requisitoFuncionalEntity = requisitoFuncionalRepository.findById(requisitoFuncional.id());
+
+        requisitoFuncionalEntity.ifPresent(rf -> {
+            rf.setDescripcion(requisitoFuncional.descripcion());
+            rf.setFechaCreacion(requisitoFuncional.fechaCreacion());
+            rf.setEstado(requisitoFuncional.estado());
+            rf.setReglas(requisitoFuncional.reglas());
+            rf.setTitulo(requisitoFuncional.titulo());
+
+            requisitoFuncionalRepository.save(rf);
         });
     }
 

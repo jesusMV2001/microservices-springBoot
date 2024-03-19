@@ -41,11 +41,6 @@ public class RequisitosController {
         return serviceImplementacion.verImplementacion(id);
     }
 
-    @PutMapping("/{id}")
-    private void cambiarImplementacion(@PathVariable Long id, @RequestBody DTOImplementacion implementacion){
-        serviceImplementacion.cambiarImplementacion(id, implementacion);
-    }
-
     @DeleteMapping("/{id}")
     private void borrarImplementacion(@PathVariable Long id){
         serviceImplementacion.borrarImplementacion(id);
@@ -65,6 +60,11 @@ public class RequisitosController {
     @PostMapping("/{id}/RequisitoFuncional")
     private void addRequisitoFuncional(@PathVariable Long id, @RequestBody DTORequisitoFuncional requisitoFuncional){
         serviceImplementacion.addRequisito(id, requisitoFuncional);
+    }
+
+    @PutMapping("/{id}/RequisitoFuncional")
+    private void actualizarRequisitoFuncional(@PathVariable Long id, @RequestBody DTORequisitoFuncional rf){
+        serviceImplementacion.actualizarRequisitoFuncional(id,rf);
     }
 
     @DeleteMapping("/{id}/RequisitoFuncional/{idRF}")

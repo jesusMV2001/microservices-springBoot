@@ -1,7 +1,7 @@
 <template>
   <div class="w-full" @keydown.esc="mostrarFormulario=false; mostrarConfirmacion=false">
     <h2 class="text-lg font-bold mb-4">{{ title }}</h2>
-    <button @click="mostrarFormulario = true"
+    <button @click="mostrarFormulario = true; modoFormulario='Crear'"
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">Añadir Requisito
     </button>
     <!-- Tabla con los datos -->
@@ -29,8 +29,9 @@
             <button @click="verComentarios(rowIndex)"
                     class="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Comentarios</button>
             <button @click="eliminarRF(rowIndex)"
-                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Borrar</button>
-
+                    class="mr-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Borrar</button>
+            <button @click="editarRF(rowIndex)"
+                    class="mr-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Editar</button>
           </td>
         </tr>
         </tbody>
@@ -40,8 +41,8 @@
     <!-- Modal con el formulario -->
     <div v-if="mostrarFormulario" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
       <div class="bg-white rounded-lg p-8 w-1/2">
-        <h3 class="text-lg font-bold mb-4">Nuevo Comentario</h3>
-        <form @submit.prevent="crearRF">
+        <h3 class="text-lg font-bold mb-4">{{modoFormulario}} Comentario</h3>
+        <form @submit.prevent="onSubmit">
           <div class="mb-4">
             <label for="titulo" class="block text-gray-700 text-sm font-bold mb-2">Título:</label>
             <input id="titulo" v-model="nuevoRF.titulo" required
@@ -102,6 +103,7 @@ export default {
     return {
       headers: [],
       data: [],
+      modoFormulario: '',
       mostrarConfirmacion: false,
       rowIndexToDelete: null,
       sortByColumn: '', // Columna actualmente ordenada
@@ -216,7 +218,40 @@ export default {
       // Cerrar el modal y limpiar el índice de la fila a eliminar
       this.mostrarConfirmacion = false;
       this.rowIndexToDelete = null;
+    },
+    editarRF(rowIndex) {
+      const rfSeleccionado = this.data[rowIndex];
+      this.nuevoRF = { ...rfSeleccionado };
+      this.modoFormulario = 'Editar';
+      this.mostrarFormulario = true;
+    },
+    actualizarRF() {
+      const id = this.$route.params.id; // ID del implementación
+      this.nuevoRF.fechaCreacion = new Date(this.nuevoRF.fechaCreacion)
+      axios.put(`http://localhost:8080/api/implementacion/${id}/RequisitoFuncional`, this.nuevoRF)
+          .then(() => {
+            this.mostrarFormulario = false;
+            this.fetchData(`http://localhost:8080/api/implementacion/${id}/RequisitoFuncional`); // Recargar datos
+            this.nuevoRF = {
+              titulo: '',
+              descripcion: '',
+              reglas: '',
+              estado: '',
+              fechaCreacion: new Date().toISOString().substring(0, 10)
+            }
+          })
+          .catch(error => {
+            console.error('Error al actualizar el RF:', error);
+          });
+    },
+    onSubmit() {
+      if (this.modoFormulario === 'Crear') {
+        this.crearRF();
+      } else if (this.modoFormulario === 'Editar') {
+        this.actualizarRF();
+      }
     }
+
   },
   computed: {
     sortedData() {
