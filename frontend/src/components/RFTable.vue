@@ -115,7 +115,7 @@ export default {
         descripcion: '',
         reglas: '',
         estado: '',
-          fechaCreacion: new Date().toISOString().substring(0, 10)
+        fechaCreacion: new Date().toISOString().substring(0, 10)
       }
     };
   },

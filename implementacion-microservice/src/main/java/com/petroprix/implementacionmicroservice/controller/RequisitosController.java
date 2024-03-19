@@ -87,6 +87,11 @@ public class RequisitosController {
         serviceImplementacion.deleteComentario(id, comentarioId);
     }
 
+    @PutMapping("/Comentario")
+    private void actualizarComentario(@RequestBody DTOHistoricoComentarios comentario){
+        serviceImplementacion.actualizarComentario(comentario);
+    }
+
     @GetMapping("/RequisitoFuncional/{RequisitoFuncionalId}/Comentario")
     private ResponseEntity<List<DTOHistoricoComentarios>> verComentarios(@PathVariable Long RequisitoFuncionalId){
         return serviceImplementacion.verComentarios(RequisitoFuncionalId);
@@ -100,6 +105,11 @@ public class RequisitosController {
     @DeleteMapping("/RequisitoFuncional/{RequisitoFuncionalId}/RequisitoTecnico/{id}")
     private void deleteRequisitoTecnico(@PathVariable Long id, @PathVariable Long RequisitoFuncionalId){
         serviceImplementacion.deleteRequisitoTecnico(id,RequisitoFuncionalId);
+    }
+
+    @PutMapping("/RequisitoTecnico")
+    private void actualizarRequisitoTecnico(@RequestBody DTORequisitoTecnico requisitoTecnico){
+        serviceImplementacion.actualizarRequisitoTecnico(requisitoTecnico);
     }
 
     @GetMapping("/RequisitoFuncional/{RequisitoFuncionalId}/RequisitoTecnico")

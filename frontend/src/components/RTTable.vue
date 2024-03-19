@@ -1,7 +1,7 @@
 <template>
   <div class="w-full" @keydown.esc="cancelarRT">
     <h2 class="text-lg font-bold mb-4">{{ title }}</h2>
-    <button @click="mostrarFormulario = true"
+    <button @click="mostrarFormulario = true; modoFormulario='Crear'"
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">Añadir Requisito
     </button>
 
@@ -9,8 +9,8 @@
     <div v-if="mostrarFormulario"
          class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
       <div class="bg-white rounded-lg p-8 w-1/2">
-        <h3 class="text-lg font-bold mb-4">Nuevo Requisito Técnico</h3>
-        <form @submit.prevent="crearRT" >
+        <h3 class="text-lg font-bold mb-4">{{modoFormulario}} Requisito Técnico</h3>
+        <form @submit.prevent="onSubmit" >
           <div class="mb-4">
             <label for="titulo" class="block text-gray-700 text-sm font-bold mb-2">titulo:</label>
             <input id="titulo" v-model="nuevoRT.titulo" required
@@ -48,7 +48,9 @@
               class="px-4 py-2 border">{{ value }}</td>
           <td class="px-4 py-2 border">
             <button @click="eliminarRT(rowIndex)"
-                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Borrar</button>
+                    class="mr-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Borrar</button>
+            <button @click="editarRT(rowIndex)"
+                    class="mr-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Editar</button>
           </td>
         </tr>
         </tbody>
@@ -78,7 +80,8 @@ export default {
         descripcion: ''
       },
       sortByColumn: '',
-      sortDirection: 'asc'
+      sortDirection: 'asc',
+      modoFormulario: ''
     };
   },
   mounted() {
@@ -120,7 +123,7 @@ export default {
             this.fetchData(`http://localhost:8080/api/implementacion/RequisitoFuncional/${id}/RequisitoTecnico`)
             this.nuevoRT = {
               titulo: '',
-                  descripcion: ''
+              descripcion: ''
             }
           })
           .catch(error => {
@@ -148,6 +151,33 @@ export default {
         //establecer la nueva columna de ordenamiento y la dirección predeterminada ascendente
         this.sortByColumn = column;
         this.sortDirection = 'asc';
+      }
+    },
+    editarRT(rowIndex){
+      this.nuevoRT = { ...this.data[rowIndex] };
+      this.modoFormulario = 'Editar';
+      this.mostrarFormulario = true;
+    },
+    actualizarRT() {
+      const id = this.$route.params.id;
+      axios.put(`http://localhost:8080/api/implementacion/RequisitoTecnico`, this.nuevoRT)
+          .then(() => {
+            this.mostrarFormulario = false;
+            this.fetchData(`http://localhost:8080/api/implementacion/RequisitoFuncional/${id}/RequisitoTecnico`)
+            this.nuevoRT = {
+              titulo: '',
+              descripcion: ''
+            }
+          })
+          .catch(error => {
+            console.error('Error al actualizar el RF:', error);
+          });
+    },
+    onSubmit() {
+      if (this.modoFormulario === 'Crear') {
+        this.crearRT();
+      } else if (this.modoFormulario === 'Editar') {
+        this.actualizarRT();
       }
     }
   },

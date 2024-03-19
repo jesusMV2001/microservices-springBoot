@@ -174,6 +174,17 @@ public class ServiceImplementacion {
         });
     }
 
+    public void actualizarComentario(DTOHistoricoComentarios comentario) {
+        Optional<HistoricoComentarios> historicoComentarios = historicoComentariosRepository.findById(comentario.id());
+
+        historicoComentarios.ifPresent(c -> {
+            c.setComentario(comentario.comentario());
+            c.setFecha(comentario.fecha());
+
+            historicoComentariosRepository.save(c);
+        });
+    }
+
     public void deleteComentario(Long id, Long comentarioId) {
         Optional<RequisitoFuncionalEntity> rf = requisitoFuncionalRepository.findById(id);
         Optional<HistoricoComentarios> c = historicoComentariosRepository.findById(comentarioId);
@@ -202,6 +213,17 @@ public class ServiceImplementacion {
             requisitoTecnicoRepository.save(requisitoTecnico);
             requisitoFuncional.getRequisitosTecnicos().add(requisitoTecnico);
             requisitoFuncionalRepository.save(requisitoFuncional);
+        });
+    }
+
+    public void actualizarRequisitoTecnico(DTORequisitoTecnico requisitoTecnico) {
+        Optional<RequisitoTecnicoEntity> requisitoTecnicoEntity = requisitoTecnicoRepository.findById(requisitoTecnico.id());
+
+        requisitoTecnicoEntity.ifPresent(rt ->{
+            rt.setDescripcion(requisitoTecnico.descripcion());
+            rt.setTitulo(requisitoTecnico.titulo());
+
+            requisitoTecnicoRepository.save(rt);
         });
     }
 
@@ -435,6 +457,7 @@ public class ServiceImplementacion {
 
         return table;
     }
+
 
 
 }
