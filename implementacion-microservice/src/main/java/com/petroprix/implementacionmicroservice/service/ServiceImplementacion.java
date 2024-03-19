@@ -191,7 +191,6 @@ public class ServiceImplementacion {
 
         rf.flatMap(funcional -> c).ifPresent(comentario ->{
             rf.get().getHistoricoComentarios().remove(comentario);
-            requisitoFuncionalRepository.save(rf.get());
             historicoComentariosRepository.delete(comentario);
         });
     }
