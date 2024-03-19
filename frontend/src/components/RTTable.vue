@@ -81,7 +81,7 @@ export default {
       },
       sortByColumn: '',
       sortDirection: 'asc',
-      modoFormulario: ''
+        modoFormulario: ''
     };
   },
   mounted() {

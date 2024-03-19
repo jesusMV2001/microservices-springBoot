@@ -1,14 +1,14 @@
 <template>
   <div class="w-full" @keydown.esc="mostrarFormulario=false">
     <h2 class="text-2xl font-bold mb-4">{{ title }}</h2>
-    <button @click="mostrarFormulario = true"
+    <button @click="mostrarFormulario = true; modoFormulario='Crear'"
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">Añadir Comentario
     </button>
     <!-- Modal con el formulario -->
     <div v-if="mostrarFormulario" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
       <div class="bg-white rounded-lg p-8 w-1/2">
-        <h3 class="text-lg font-bold mb-4">Nuevo Comentario</h3>
-        <form @submit.prevent="crearComentario">
+        <h3 class="text-lg font-bold mb-4">{{modoFormulario}} Comentario</h3>
+        <form @submit.prevent="onSubmit">
           <div class="mb-4">
             <label for="comentario" class="block text-gray-700 text-sm font-bold mb-2">Contenido:</label>
             <textarea id="comentario" v-model="nuevoComentario.comentario" required
@@ -46,7 +46,9 @@
           </td>
           <td class="px-4 py-2 border">
             <button @click="eliminarComentario(rowIndex)"
-                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Borrar</button>
+                    class="mr-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Borrar</button>
+            <button @click="editarComentario(rowIndex)"
+                    class="mr-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Editar</button>
           </td>
         </tr>
         </tbody>
@@ -75,7 +77,8 @@ export default {
         fecha: new Date().toISOString().substring(0, 10)
       },
       sortByColumn: '',
-      sortDirection: 'asc'
+      sortDirection: 'asc',
+      modoFormulario: ''
     };
   },
   mounted() {
@@ -143,6 +146,34 @@ export default {
       else {
         this.sortByColumn = column
         this.sortDirection = 'asc'
+      }
+    },
+    editarComentario(rowIndex){
+      this.nuevoComentario = { ...this.data[rowIndex] };
+      this.modoFormulario = 'Editar';
+      this.mostrarFormulario = true;
+    },
+    actualizarComentario() {
+      const id = this.$route.params.id;
+      this.nuevoComentario.fecha = new Date(this.nuevoComentario.fecha)
+      axios.put(`http://localhost:8080/api/implementacion/Comentario`, this.nuevoComentario)
+          .then(() => {
+            this.mostrarFormulario = false;
+            this.fetchData(`http://localhost:8080/api/implementacion/RequisitoFuncional/${id}/Comentario`)
+            this.nuevoComentario = {
+              comentario: '',
+              fecha: new Date().toISOString().substring(0, 10)
+            }
+          })
+          .catch(error => {
+            console.error('Error al actualizar el RF:', error);
+          });
+    },
+    onSubmit() {
+      if (this.modoFormulario === 'Crear') {
+        this.crearComentario();
+      } else if (this.modoFormulario === 'Editar') {
+        this.actualizarComentario();
       }
     }
   },
