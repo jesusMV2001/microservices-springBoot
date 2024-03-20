@@ -136,6 +136,8 @@ public class ServiceImplementacion {
             rf.setEstado(requisitoFuncional.estado());
             rf.setReglas(requisitoFuncional.reglas());
             rf.setTitulo(requisitoFuncional.titulo());
+
+            requisitoFuncionalRepository.save(rf);
         });
     }
 
