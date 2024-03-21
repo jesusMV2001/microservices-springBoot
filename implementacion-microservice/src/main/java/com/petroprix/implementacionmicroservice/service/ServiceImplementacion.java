@@ -12,6 +12,7 @@ import com.petroprix.implementacionmicroservice.entity.ImplementacionEntity;
 import com.petroprix.implementacionmicroservice.collection.RegistroCambios;
 import com.petroprix.implementacionmicroservice.entity.RequisitoFuncionalEntity;
 import com.petroprix.implementacionmicroservice.entity.RequisitoTecnicoEntity;
+import com.petroprix.implementacionmicroservice.exception.ResourceNotFoundException;
 import com.petroprix.implementacionmicroservice.repository.HistoricoComentariosRepository;
 import com.petroprix.implementacionmicroservice.repository.ImplementacionRepository;
 import com.petroprix.implementacionmicroservice.repository.RequisitoFuncionalRepository;
@@ -56,11 +57,10 @@ public class ServiceImplementacion {
         return implementacionRepository.findAll();
     }
 
-    public ResponseEntity<DTOImplementacion> verImplementacion(Long id) {
-        Optional<ImplementacionEntity> implementacion = implementacionRepository.findById(id);
-
-        return implementacion.map(implementacionEntity -> ResponseEntity.ok().body(new DTOImplementacion(implementacionEntity))).
-                orElseGet(() -> ResponseEntity.notFound().build());
+    public DTOImplementacion verImplementacion(Long id) {
+        ImplementacionEntity implementacion = implementacionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Implementación no encontrada para el ID: " + id));
+        return new DTOImplementacion(implementacion);
     }
 
     public ImplementacionEntity crearImplementacion(DTOImplementacion implementacion){
@@ -93,157 +93,150 @@ public class ServiceImplementacion {
     }
 
     public void borrarImplementacion(Long id) {
-        Optional<ImplementacionEntity> implementacion = implementacionRepository.findById(id);
-
-        implementacion.ifPresent(implementacionEntity -> implementacionRepository.delete(implementacionEntity));
+        ImplementacionEntity implementacion = implementacionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Implementación no encontrada para el ID: " + id));
+        implementacionRepository.delete(implementacion);
     }
 
     public void addRegistroCambios(Long id, DTORegistroCambios registroCambios) {
-        Optional<ImplementacionEntity> implementacionOptional = implementacionRepository.findById(id);
+        ImplementacionEntity implementacion = implementacionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Implementación no encontrada para el ID: " + id));
 
-        implementacionOptional.ifPresent(implementacion -> {
-            RegistroCambios registroCambiosEntity = new RegistroCambios(registroCambios);
-            if(null == registroCambiosEntity.getFechaCambio())
-                registroCambiosEntity.setFechaCambio(LocalDateTime.now());
+        RegistroCambios registroCambiosEntity = new RegistroCambios(registroCambios);
+        if(null == registroCambiosEntity.getFechaCambio())
+            registroCambiosEntity.setFechaCambio(LocalDateTime.now());
 
-
-            implementacion.getRegistroCambiosEntities().add(registroCambiosEntity);
-            implementacionRepository.save(implementacion);
-        });
+        implementacion.getRegistroCambiosEntities().add(registroCambiosEntity);
+        implementacionRepository.save(implementacion);
     }
 
     public void addRequisito(Long id, DTORequisitoFuncional requisitoFuncional) {
-        Optional<ImplementacionEntity> implementacionOptional = implementacionRepository.findById(id);
+        ImplementacionEntity implementacion = implementacionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Implementación no encontrada para el ID: " + id));
 
-        implementacionOptional.ifPresent(implementacion -> {
-            RequisitoFuncionalEntity requisitoFuncionalEntity = new RequisitoFuncionalEntity(requisitoFuncional);
-            if(null == requisitoFuncionalEntity.getFechaCreacion())
-                requisitoFuncionalEntity.setFechaCreacion(LocalDateTime.now());
+        RequisitoFuncionalEntity requisitoFuncionalEntity = new RequisitoFuncionalEntity(requisitoFuncional);
+        if(null == requisitoFuncionalEntity.getFechaCreacion())
+            requisitoFuncionalEntity.setFechaCreacion(LocalDateTime.now());
 
-            requisitoFuncionalRepository.save(requisitoFuncionalEntity);
+        requisitoFuncionalRepository.save(requisitoFuncionalEntity);
 
-            implementacion.getRequisitoFuncionalEntityList().add(requisitoFuncionalEntity);
-            implementacionRepository.save(implementacion);
-        });
+        implementacion.getRequisitoFuncionalEntityList().add(requisitoFuncionalEntity);
+        implementacionRepository.save(implementacion);
     }
 
     public void actualizarRequisitoFuncional(Long id, DTORequisitoFuncional requisitoFuncional) {
-        Optional<RequisitoFuncionalEntity> requisitoFuncionalEntity = requisitoFuncionalRepository.findById(requisitoFuncional.id());
+        RequisitoFuncionalEntity rf = requisitoFuncionalRepository.findById(requisitoFuncional.id())
+                .orElseThrow(() -> new ResourceNotFoundException("Requisito Funcional no encontrado para el ID: " + requisitoFuncional.id()));
 
-        requisitoFuncionalEntity.ifPresent(rf -> {
-            rf.setDescripcion(requisitoFuncional.descripcion());
-            rf.setFechaCreacion(requisitoFuncional.fechaCreacion());
-            rf.setEstado(requisitoFuncional.estado());
-            rf.setReglas(requisitoFuncional.reglas());
-            rf.setTitulo(requisitoFuncional.titulo());
+        rf.setDescripcion(requisitoFuncional.descripcion());
+        rf.setFechaCreacion(requisitoFuncional.fechaCreacion());
+        rf.setEstado(requisitoFuncional.estado());
+        rf.setReglas(requisitoFuncional.reglas());
+        rf.setTitulo(requisitoFuncional.titulo());
 
-            requisitoFuncionalRepository.save(rf);
-        });
+        requisitoFuncionalRepository.save(rf);
     }
 
     public void deleteRequisitoFuncional(Long id, Long idRF) {
-        Optional<ImplementacionEntity> implementacion = implementacionRepository.findById(id);
-        Optional<RequisitoFuncionalEntity> requisitoFuncional = requisitoFuncionalRepository.findById(idRF);
+        ImplementacionEntity implementacion = implementacionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Implementación no encontrada para el ID: " + id));
+        RequisitoFuncionalEntity requisitoFuncional = requisitoFuncionalRepository.findById(idRF)
+                .orElseThrow(() -> new ResourceNotFoundException("Requisito Funcional no encontrado para el ID: " + idRF));
 
-        implementacion.flatMap(implementacionEntity -> requisitoFuncional).ifPresent(rf -> {
-            implementacion.get().getRequisitoFuncionalEntityList().remove(rf);
-            requisitoFuncionalRepository.delete(rf);
-        });
+        implementacion.getRequisitoFuncionalEntityList().remove(requisitoFuncional);
+        requisitoFuncionalRepository.delete(requisitoFuncional);
     }
 
     public ResponseEntity<List<DTORequisitoFuncional>> verRequisitoFuncional(Long id) {
-        Optional<ImplementacionEntity> implementacionOptional = implementacionRepository.findById(id);
+        ImplementacionEntity implementacion = implementacionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Implementación no encontrada para el ID: " + id));
 
-        return implementacionOptional.map(implementacionEntity -> ResponseEntity.ok().body(
-                implementacionEntity.getRequisitoFuncionalEntityList().stream().map(DTORequisitoFuncional::new).toList())).
-                orElseGet(() -> ResponseEntity.notFound().build());
+        List<DTORequisitoFuncional> requisitosFuncionales = implementacion.getRequisitoFuncionalEntityList().stream()
+                .map(DTORequisitoFuncional::new).toList();
+        return ResponseEntity.ok(requisitosFuncionales);
     }
 
     public void addComentario(Long id, DTOHistoricoComentarios dtoHistoricoComentarios) {
-        Optional<RequisitoFuncionalEntity> requisitoFuncional = requisitoFuncionalRepository.findById(id);
+        RequisitoFuncionalEntity requisitoFuncional = requisitoFuncionalRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Requisito Funcional no encontrado para el ID: " + id));
 
-        requisitoFuncional.ifPresent(requisitoFuncionalEntity -> {
-            HistoricoComentarios comentario = new HistoricoComentarios(dtoHistoricoComentarios);
-            if(null == comentario.getFecha())
-                comentario.setFecha(LocalDateTime.now());
+        HistoricoComentarios comentario = new HistoricoComentarios(dtoHistoricoComentarios);
+        if(null == comentario.getFecha())
+            comentario.setFecha(LocalDateTime.now());
 
-            historicoComentariosRepository.save(comentario);
+        historicoComentariosRepository.save(comentario);
 
-            requisitoFuncionalEntity.getHistoricoComentarios().add(comentario);
-            requisitoFuncionalRepository.save(requisitoFuncionalEntity);
-        });
+        requisitoFuncional.getHistoricoComentarios().add(comentario);
+        requisitoFuncionalRepository.save(requisitoFuncional);
     }
 
     public void actualizarComentario(DTOHistoricoComentarios comentario) {
-        Optional<HistoricoComentarios> historicoComentarios = historicoComentariosRepository.findById(comentario.id());
+        HistoricoComentarios historicoComentarios = historicoComentariosRepository.findById(comentario.id())
+                .orElseThrow(() -> new ResourceNotFoundException("Comentario no encontrado para el ID: " + comentario.id()));
 
-        historicoComentarios.ifPresent(c -> {
-            c.setComentario(comentario.comentario());
-            c.setFecha(comentario.fecha());
+        historicoComentarios.setComentario(comentario.comentario());
+        historicoComentarios.setFecha(comentario.fecha());
 
-            historicoComentariosRepository.save(c);
-        });
+        historicoComentariosRepository.save(historicoComentarios);
     }
 
     public void deleteComentario(Long id, Long comentarioId) {
-        Optional<RequisitoFuncionalEntity> rf = requisitoFuncionalRepository.findById(id);
-        Optional<HistoricoComentarios> c = historicoComentariosRepository.findById(comentarioId);
+        RequisitoFuncionalEntity requisitoFuncional = requisitoFuncionalRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Requisito Funcional no encontrado para el ID: " + id));
+        HistoricoComentarios comentario = historicoComentariosRepository.findById(comentarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comentario no encontrado para el ID: " + comentarioId));
 
-        rf.flatMap(funcional -> c).ifPresent(comentario ->{
-            rf.get().getHistoricoComentarios().remove(comentario);
-            historicoComentariosRepository.delete(comentario);
-        });
+        requisitoFuncional.getHistoricoComentarios().remove(comentario);
+        historicoComentariosRepository.delete(comentario);
     }
 
     public ResponseEntity<List<DTOHistoricoComentarios>> verComentarios(Long requisitoFuncionalId) {
-        Optional<RequisitoFuncionalEntity> requisitoFuncionalEntity = requisitoFuncionalRepository.findById(requisitoFuncionalId);
+        RequisitoFuncionalEntity requisitoFuncional = requisitoFuncionalRepository.findById(requisitoFuncionalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Requisito Funcional no encontrado para el ID: " + requisitoFuncionalId));
 
-        return requisitoFuncionalEntity.map(rf -> ResponseEntity.ok().body(
-                    rf.getHistoricoComentarios().stream().map(DTOHistoricoComentarios::new).toList())).
-                orElseGet(() -> ResponseEntity.notFound().build());
+        List<DTOHistoricoComentarios> comentarios = requisitoFuncional.getHistoricoComentarios().stream()
+                .map(DTOHistoricoComentarios::new).toList();
+        return ResponseEntity.ok(comentarios);
     }
 
     public void addRequisitoTecnico(Long requisitoFuncionalId, DTORequisitoTecnico dtoRequisitoTecnico) {
-        Optional<RequisitoFuncionalEntity> requisitoFuncionalEntity = requisitoFuncionalRepository.findById(requisitoFuncionalId);
+        RequisitoFuncionalEntity requisitoFuncional = requisitoFuncionalRepository.findById(requisitoFuncionalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Requisito Funcional no encontrado para el ID: " + requisitoFuncionalId));
 
-        requisitoFuncionalEntity.ifPresent(requisitoFuncional -> {
-            RequisitoTecnicoEntity requisitoTecnico = new RequisitoTecnicoEntity(dtoRequisitoTecnico);
+        RequisitoTecnicoEntity requisitoTecnico = new RequisitoTecnicoEntity(dtoRequisitoTecnico);
+        requisitoTecnicoRepository.save(requisitoTecnico);
 
-            requisitoTecnicoRepository.save(requisitoTecnico);
-            requisitoFuncional.getRequisitosTecnicos().add(requisitoTecnico);
-            requisitoFuncionalRepository.save(requisitoFuncional);
-        });
+        requisitoFuncional.getRequisitosTecnicos().add(requisitoTecnico);
+        requisitoFuncionalRepository.save(requisitoFuncional);
     }
 
     public void actualizarRequisitoTecnico(DTORequisitoTecnico requisitoTecnico) {
-        Optional<RequisitoTecnicoEntity> requisitoTecnicoEntity = requisitoTecnicoRepository.findById(requisitoTecnico.id());
+        RequisitoTecnicoEntity requisitoTecnicoEntity = requisitoTecnicoRepository.findById(requisitoTecnico.id())
+                .orElseThrow(() -> new ResourceNotFoundException("Requisito Tecnico no encontrado para el ID: " + requisitoTecnico.id()));
 
-        requisitoTecnicoEntity.ifPresent(rt ->{
-            rt.setDescripcion(requisitoTecnico.descripcion());
-            rt.setTitulo(requisitoTecnico.titulo());
+        requisitoTecnicoEntity.setDescripcion(requisitoTecnico.descripcion());
+        requisitoTecnicoEntity.setTitulo(requisitoTecnico.titulo());
 
-            requisitoTecnicoRepository.save(rt);
-        });
+        requisitoTecnicoRepository.save(requisitoTecnicoEntity);
     }
 
     public void deleteRequisitoTecnico(Long id, Long rfId) {
-        Optional<RequisitoFuncionalEntity> rf = requisitoFuncionalRepository.findById(rfId);
-        Optional<RequisitoTecnicoEntity> rt = requisitoTecnicoRepository.findById(id);
+        RequisitoFuncionalEntity requisitoFuncional = requisitoFuncionalRepository.findById(rfId)
+                .orElseThrow(() -> new ResourceNotFoundException("Requisito Funcional no encontrado para el ID: " + rfId));
+        RequisitoTecnicoEntity requisitoTecnico = requisitoTecnicoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Requisito Tecnico no encontrado para el ID: " + id));
 
-        rf.flatMap(funcional -> rt).ifPresent(requisito -> {
-            rf.get().getRequisitosTecnicos().remove(requisito);
-            requisitoFuncionalRepository.save(rf.get());
-            requisitoTecnicoRepository.delete(requisito);
-        });
-
+        requisitoFuncional.getRequisitosTecnicos().remove(requisitoTecnico);
+        requisitoTecnicoRepository.delete(requisitoTecnico);
     }
 
     public ResponseEntity<List<DTORequisitoTecnico>> verRequisitosTecnicos(Long requisitoFuncionalId) {
-        Optional<RequisitoFuncionalEntity> requisitoFuncionalEntity = requisitoFuncionalRepository.findById(requisitoFuncionalId);
+        RequisitoFuncionalEntity requisitoFuncional = requisitoFuncionalRepository.findById(requisitoFuncionalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Requisito Funcional no encontrado para el ID: " + requisitoFuncionalId));
 
-        return requisitoFuncionalEntity.map(rf -> ResponseEntity.ok().body(
-                        rf.getRequisitosTecnicos().stream().map(DTORequisitoTecnico::new).toList())).
-                orElseGet(() -> ResponseEntity.notFound().build());
+        List<DTORequisitoTecnico> requisitosTecnicos = requisitoFuncional.getRequisitosTecnicos().stream()
+                .map(DTORequisitoTecnico::new).toList();
+        return ResponseEntity.ok(requisitosTecnicos);
     }
 
     /**

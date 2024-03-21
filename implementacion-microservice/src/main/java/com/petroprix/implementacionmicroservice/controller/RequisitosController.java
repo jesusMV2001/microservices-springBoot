@@ -37,8 +37,9 @@ public class RequisitosController {
     }
 
     @GetMapping("/{id}")
-    private ResponseEntity<DTOImplementacion> verImplementacion(@PathVariable Long id){
-        return serviceImplementacion.verImplementacion(id);
+    public ResponseEntity<DTOImplementacion> verImplementacion(@PathVariable Long id){
+        DTOImplementacion implementacion = serviceImplementacion.verImplementacion(id);
+        return ResponseEntity.ok(implementacion);
     }
 
     @DeleteMapping("/{id}")
