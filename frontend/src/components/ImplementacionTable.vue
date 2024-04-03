@@ -55,7 +55,7 @@
   <!-- Modal con el formulario -->
   <div v-if="mostrarFormulario" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
     <div class="bg-white rounded-lg p-8 w-1/2">
-      <h3 class="text-lg font-bold mb-4">Nuevo Comentario</h3>
+      <h3 class="text-lg font-bold mb-4">Nueva Implementacion</h3>
       <form @submit.prevent="crearImplementacion">
         <div class="mb-4">
           <label for="nombre" class="block text-gray-700 text-sm font-bold mb-2">Nombre:</label>
